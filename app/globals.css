@@ -1,3 +1,4 @@
+@import url("/fonts/fonts.css");
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "../vendor/shadcn-tailwind-4.13.0.css";
@@ -105,3 +106,4 @@
 /* Allow content containers to shrink beside page gutters. */
 .container{width:auto}
 @media(min-width:801px){.hero{padding-top:34px;gap:24px}.hero-copy{padding-top:23px;padding-bottom:70px}.hero-picture{height:310px}.hero h1{font-size:42px}.section{margin-top:38px}}
+.auth-providers{display:grid;gap:12px;margin:22px 0 14px}.auth-providers .button{min-height:52px;justify-content:center;gap:12px}.provider-google{background:#fff!important;color:#172d3e!important;border-color:#d5dde3!important}.provider-google:hover{background:#f8fafb!important}.provider-facebook{background:#0866ff!important;color:#fff!important;border-color:#0866ff!important}.provider-facebook:hover{background:#075be0!important}.provider-loading{display:inline-flex;align-items:center;justify-content:center;min-height:24px}
