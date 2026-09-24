@@ -286,16 +286,16 @@
 
 @media(max-width:640px){
   .bottom-nav{
-    background:rgba(45,64,79,.82);
-    border-color:rgba(227,237,242,.43);
-    -webkit-backdrop-filter:blur(24px) saturate(145%);
-    backdrop-filter:blur(24px) saturate(145%);
-    box-shadow:0 14px 38px rgba(16,37,53,.28),inset 0 1px 0 rgba(255,255,255,.18)
+    background:rgba(230,238,244,.79);
+    border-color:rgba(255,255,255,.88);
+    -webkit-backdrop-filter:blur(24px) saturate(155%);
+    backdrop-filter:blur(24px) saturate(155%);
+    box-shadow:0 13px 34px rgba(23,45,62,.17),inset 0 1px 0 rgba(255,255,255,.84)
   }
   .bottom-nav-indicator{
-    background:rgba(14,34,50,.96);
-    box-shadow:0 5px 16px rgba(8,24,38,.3),inset 0 1px 0 rgba(255,255,255,.13)
+    background:#172d3e;
+    box-shadow:0 5px 16px rgba(23,45,62,.21),inset 0 1px 0 rgba(255,255,255,.1)
   }
-  .bottom-nav .bottom-nav-item{color:#d0dce4}
+  .bottom-nav .bottom-nav-item{color:#536879}
   .bottom-nav .bottom-nav-item.active{color:#fff}
 }
