@@ -405,7 +405,6 @@ export default function Welaa() {
         <nav><Link href="/search">ค้นหาพื้นที่</Link><Link href="/#categories">หมวดหมู่</Link><Link href="/how-it-works">วิธีใช้งาน</Link></nav>
         {data.user
           ? <>
-              <Link className="button" href="/host/new"><Plus size={17} />ปล่อยพื้นที่</Link>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
