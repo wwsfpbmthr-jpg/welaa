@@ -67,9 +67,11 @@ export default function Welaa() {
 
   const refresh = useCallback(async () => {
     try {
-      const { data: authData, error: authError } = await supabase.auth.getUser();
-      if (authError) throw authError;
-      const user = authData.user;
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) throw sessionError;
+      const authResult = sessionData.session ? await supabase.auth.getUser() : null;
+      if (authResult?.error) throw authResult.error;
+      const user = authResult?.data.user ?? null;
 
       let profile: any = null;
       if (user) {
@@ -165,7 +167,13 @@ export default function Welaa() {
       setData(nextData);
       setError('');
     } catch (e: any) {
-      setError(e?.message || 'โหลดข้อมูลไม่สำเร็จ');
+      const message = e?.message || 'โหลดข้อมูลไม่สำเร็จ';
+      if (e?.name === 'AuthSessionMissingError' || /auth session missing/i.test(message)) {
+        setData((current) => ({ ...current, user: null }));
+        setError('');
+      } else {
+        setError(message);
+      }
     } finally {
       setReady(true);
     }
@@ -385,9 +393,11 @@ export default function Welaa() {
         <Logo />
         <nav><Link href="/search">ค้นหาพื้นที่</Link><Link href="/#categories">หมวดหมู่</Link><Link href="/how-it-works">วิธีใช้งาน</Link></nav>
         {data.user
-          ? <Link className="account-link" href="/account"><UserRound size={17} />{data.user.name}</Link>
-          : <button className="login-link" onClick={() => auth()}>เข้าสู่ระบบ / สมัครสมาชิก</button>}
-        <Link className="button" href="/host/new"><Plus size={17} />ปล่อยพื้นที่</Link>
+          ? <>
+              <Link className="account-link" href="/account"><UserRound size={17} />{data.user.name}</Link>
+              <Link className="button" href="/host/new"><Plus size={17} />ปล่อยพื้นที่</Link>
+            </>
+          : <button className="button" onClick={() => auth()}>เข้าสู่ระบบ/สมัครสมาชิก</button>}
       </header>
       {error && <div className="data-error">{error} <button className="text-link" onClick={() => void refresh()}>ลองใหม่</button></div>}
       <main>{view}</main>
