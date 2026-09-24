@@ -158,3 +158,17 @@
 .facebook-button{background:#0866ff;color:#fff;border-color:#0866ff;justify-content:center;position:relative;min-height:48px}
 .facebook-button:hover{background:#075be0}
 .facebook-button:disabled{opacity:.6}
+
+/* Reassert account-profile styles in the production bundle. */
+.profile-page .profile-hero{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:18px;padding:25px 28px;background:#172d3e;color:#fff;border-radius:16px}
+.profile-page .profile-avatar{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:#ffffff1c;color:#fff}
+.profile-page .profile-auth-actions{display:flex;align-items:center;gap:9px}
+.profile-page .profile-menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+.profile-page .profile-menu-group{overflow:hidden;background:#fff;border:1px solid #e1e7eb;border-radius:13px}
+.profile-page .profile-menu-group h2{margin:0;padding:18px 18px 11px;color:#172d3e;font-size:17px}
+.profile-page .profile-row{display:flex;width:100%;min-height:68px;align-items:center;gap:14px;padding:12px 17px;border-top:1px solid #edf0f2;background:#fff;color:#172d3e;text-align:left}
+.profile-page .profile-row>span{display:flex;flex:1;min-width:0;flex-direction:column;gap:3px}
+.profile-page .profile-row b{font-size:14px;font-weight:600}
+.profile-page .profile-row small{color:#7a8992;font-size:12px}
+@media(max-width:800px){.profile-page{margin:24px 20px 76px}.profile-page .profile-hero{grid-template-columns:auto minmax(0,1fr);gap:14px;padding:20px}.profile-page .profile-auth-actions{grid-column:1/-1}.profile-page .profile-auth-actions .button{flex:1}.profile-page .profile-menu-grid{grid-template-columns:1fr}}
+@media(max-width:480px){.profile-page .profile-hero{padding:18px}.profile-page .profile-avatar{width:48px;height:48px}.profile-page .profile-welcome h1{font-size:24px}.profile-page .profile-welcome p{font-size:13px}.profile-page .profile-menu-group h2{font-size:16px}}
