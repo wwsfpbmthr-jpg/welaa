@@ -1,6 +1,6 @@
 export type Space={id:string;name:string;type:string;area:string;city:string;price:number;guests:number;rating:number;reviews:number;image:string;images?:string[];activities:string[];amenities:string[];description:string;host:string;distance:number;lat:number;lng:number;open:number;close:number;instant:boolean;owner?:string;rules:string;date?:string};
-export const categories=['ทั้งหมด','ถ่าย Content','ประชุม','ติว / เรียน','จัดงาน','ซ้อมดนตรี','ถ่ายภาพ','Pop-up','กีฬา','ทำงาน','ที่จอดรถ'];
-export const types=['สตูดิโอ','ห้องประชุม','ห้องทำงาน','ห้องว่าง','ดาดฟ้า','สวน','คาเฟ่','ห้องซ้อม','สนาม','พื้นที่จัดงาน','พื้นที่ Pop-up','โกดัง','ที่จอดรถ'];
+export const categories=['ทั้งหมด','ถ่าย Content','ประชุม','ติว / เรียน','จัดงาน','ซ้อมดนตรี','ถ่ายภาพ','Pop-up','กีฬา','ทำงาน','ที่จอดรถ','ที่พัก / งีบพัก'];
+export const types=['สตูดิโอ','ห้องประชุม','ห้องทำงาน','ห้องว่าง','ดาดฟ้า','สวน','คาเฟ่','ห้องซ้อม','สนาม','พื้นที่จัดงาน','พื้นที่ Pop-up','โกดัง','ที่จอดรถ','ห้องพักรายชั่วโมง','ที่พัก / งีบพัก','โรงแรม','โฮสเทล','รีสอร์ต'];
 export const cities=['หาดใหญ่','สงขลา','กรุงเทพฯ','เชียงใหม่'];
 export const facilities=['Wi-Fi','เครื่องปรับอากาศ','ที่จอดรถ','แสงธรรมชาติ','ห้องน้ำ','โปรเจคเตอร์','ปลั๊กไฟ','น้ำดื่ม'];
 const rows:[string,string,string,number,number,string,string[],number,number][]=[
@@ -38,4 +38,25 @@ export const initial:AppData={user:null,spaces:[],occupied:[],availability:[],bo
 export function slotStatus(s:Space,date:string,h:number,data:AppData){if(h<s.open||h>=s.close||isPast(date,h))return 'unavailable';const booked=data.occupied.find(o=>o.space_id===s.id&&o.date===date&&o.hour===h);if(booked)return 'booked';const slot=data.availability.find(a=>a.space_id===s.id&&a.date===date&&a.hour===h);return slot?.is_open===true?'available':'unavailable'}
 export const slotPrice=(s:Space,d:string,h:number,data:AppData)=>data.availability.find(a=>a.space_id===s.id&&a.date===d&&a.hour===h)?.price??s.price;
 export function instantInfo(s:Space,data:AppData){const d=today(),now=Number(new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Bangkok',hour:'2-digit',hourCycle:'h23'}).format(new Date()));const custom=data.availability.filter(a=>a.space_id===s.id&&a.date===d&&a.instant&&a.hour>now&&slotStatus(s,d,a.hour,data)==='available');if(custom.length)return {price:Math.min(...custom.map(a=>a.price)),end:Math.max(...custom.map(a=>a.hour))+1};if(s.instant&&s.close>now+1&&Array.from({length:s.close-s.open},(_,i)=>s.open+i).some(h=>slotStatus(s,d,h,data)==='available'))return {price:s.price,end:s.close};return null}
-export function parseSearch(q:string){let cat='ทั้งหมด';if(/tiktok|content|คอนเทนต์/i.test(q))cat='ถ่าย Content';else if(/ถ่ายรูป|ถ่ายภาพ|studio|สตูดิโอ/i.test(q))cat='ถ่ายภาพ';else if(/ประชุม|meeting/i.test(q))cat='ประชุม';else if(/ติว|เรียน/.test(q))cat='ติว / เรียน';else if(/ซ้อม|ดนตรี/.test(q))cat='ซ้อมดนตรี';else if(/จอด/.test(q))cat='ที่จอดรถ';else if(/กีฬา|สนาม/.test(q))cat='กีฬา';else if(/ทำงาน/.test(q))cat='ทำงาน';else if(/จัดงาน/.test(q))cat='จัดงาน';return {cat,date:/พรุ่งนี้/.test(q)?datePlus(1):/วันนี้|คืนนี้/.test(q)?today():'',guests:Number(q.match(/(\d+)\s*คน/)?.[1]||0),duration:Math.min(24,Number(q.match(/(\d+)\s*ชั่วโมง/)?.[1]||0)),start:/คืนนี้|เย็น/.test(q)?18:/บ่าย/.test(q)?13:0,city:cities.find(c=>q.includes(c))||''}}
+export function parseSearch(q:string){
+  let cat='ทั้งหมด';
+  if(/ที่พัก|โรงแรม|โฮสเทล|รีสอร์ต|รีสอร์ท|ห้องพัก|งีบ|นอน|หลับ|sleep|stay/i.test(q))cat='ที่พัก / งีบพัก';
+  else if(/tiktok|content|คอนเทนต์/i.test(q))cat='ถ่าย Content';
+  else if(/ถ่ายรูป|ถ่ายภาพ|studio|สตูดิโอ/i.test(q))cat='ถ่ายภาพ';
+  else if(/ประชุม|meeting/i.test(q))cat='ประชุม';
+  else if(/ติว|เรียน/.test(q))cat='ติว / เรียน';
+  else if(/ซ้อม|ดนตรี/.test(q))cat='ซ้อมดนตรี';
+  else if(/จอด/.test(q))cat='ที่จอดรถ';
+  else if(/กีฬา|สนาม/.test(q))cat='กีฬา';
+  else if(/ทำงาน/.test(q))cat='ทำงาน';
+  else if(/จัดงาน/.test(q))cat='จัดงาน';
+  const durationMatch=q.match(/(\\d+)\\s*(?:[-–]\\s*\\d+\\s*)?(?:ชั่วโมง|ชม\\.?)/);
+  return {
+    cat,
+    date:/พรุ่งนี้/.test(q)?datePlus(1):/วันนี้|คืนนี้/.test(q)?today():'',
+    guests:Number(q.match(/(\\d+)\\s*คน/)?.[1]||0),
+    duration:Math.min(24,Number(durationMatch?.[1]||0)),
+    start:/คืนนี้|เย็น/.test(q)?18:/บ่าย/.test(q)?13:0,
+    city:cities.find(c=>q.includes(c))||''
+  }
+}
