@@ -144,3 +144,10 @@
 .account-settings-button{margin-left:14px}
 @media(max-width:800px){.profile-page{margin:24px 20px 76px}.profile-menu-grid{grid-template-columns:1fr}.profile-hero{grid-template-columns:auto 1fr;padding:20px;gap:14px}.profile-auth-actions{grid-column:1/-1}.profile-auth-actions .button{flex:1}.account-settings-button{margin:14px 0 0}}
 @media(max-width:480px){.profile-hero{grid-template-columns:auto 1fr;padding:18px}.profile-avatar{width:48px;height:48px}.profile-welcome h1{font-size:24px}.profile-welcome p{font-size:13px}.profile-menu-group h2{font-size:16px}}
+
+.google-button{background:#fff;color:#172d3e;border:1px solid #dbe3e8;justify-content:center;position:relative;min-height:48px}
+.google-button:hover{background:#f7f9fa}
+.google-button:disabled{opacity:.6}
+.google-mark{position:absolute;left:16px;width:23px;height:23px;border-radius:50%;display:grid;place-items:center;background:#fff;color:#4285f4;font-weight:700;font-family:Arial,sans-serif;font-size:18px}
+.auth-divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:#7b8992;font-size:13px}
+.auth-divider:before,.auth-divider:after{content:'';height:1px;background:#e5eaed;flex:1}
