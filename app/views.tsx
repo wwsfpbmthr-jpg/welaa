@@ -15,22 +15,13 @@ export function Home(){
   const [category,setCategory]=useState('ทั้งหมด');
   const current=all.filter(s=>instantInfo(s,data));
   const selected=all.filter(s=>category==='ทั้งหมด'||s.activities.includes(category));
-  const mapSpace=all[0];
-  const lat=mapSpace?.lat??7.008,lng=mapSpace?.lng??100.474,city=mapSpace?.city??'หาดใหญ่';
-  const mapSource=`https://www.openstreetmap.org/export/embed.html?bbox=${lng-.045}%2C${lat-.03}%2C${lng+.045}%2C${lat+.03}&layer=mapnik&marker=${lat}%2C${lng}`;
   return <>
-    <section className="hero">
-      <div className="hero-copy">
-        <div className="eyebrow"><i/> A little space. A world of possibilities.</div>
-        <p>ค้นหาและจองพื้นที่สำหรับสิ่งที่คุณต้องการ<br/>หรือเปลี่ยนพื้นที่ที่ไม่ได้ใช้งานให้สร้างรายได้</p>
-      </div>
-      <div className="hero-picture hero-map">
-        <iframe className="hero-map-frame" title={`แผนที่พื้นที่แถว${city}`} src={mapSource} loading="lazy"/>
-        <div className="hero-map-label"><MapPin size={16}/><span>สำรวจแผนที่ · {city}</span></div>
-      </div>
+    <div className="container home-top-categories" id="categories">
+      <Categories value={category} onChange={setCategory}/>
+    </div>
+    <section className="home-search">
       <SearchBox/>
     </section>
-    <div className="container"><Categories value={category} onChange={setCategory}/></div>
     {category==='ทั้งหมด'&&<section className="section">
       <SectionHead title="ว่างตอนนี้" sub="ไอเดียพร้อมแล้ว พื้นที่ก็พร้อมเหมือนกัน" eyebrow="A LITTLE MORE SPONTANEOUS" href="/search?instant=1" live/>
       {current.length?<div className="space-grid">{current.slice(0,4).map(s=><SpaceCard key={s.id} s={s} instant/>)}</div>:<div className="quiet-empty"><Clock size={22}/><span>ช่วงว่างวันนี้หมดแล้ว มองหาพื้นที่สำหรับพรุ่งนี้ได้เลย</span><Link href={'/search?date='+datePlus(1)}>ดูเวลาพรุ่งนี้ <ArrowRight size={16}/></Link></div>}
