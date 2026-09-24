@@ -153,3 +153,8 @@
 .auth-divider:before,.auth-divider:after{content:'';height:1px;background:#e5eaed;flex:1}
 
 .host-banner-text-only{grid-template-columns:1fr}
+
+.google-brand-mark,.facebook-brand-mark{position:absolute;left:16px;width:23px;height:23px}
+.facebook-button{background:#0866ff;color:#fff;border-color:#0866ff;justify-content:center;position:relative;min-height:48px}
+.facebook-button:hover{background:#075be0}
+.facebook-button:disabled{opacity:.6}
