@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Plus, Search, Compass, CalendarDays, UserRound, ArrowUpRight, ShieldCheck } from 'lucide-react';
+import { Plus, Search, Compass, CalendarDays, UserRound, ArrowUpRight, ShieldCheck, Menu, House, Heart, CircleHelp, LogOut } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Toaster, toast } from 'sonner';
 import { AppContext } from './context';
 import { AppData, Space, initial, coordinates, datePlus, today } from './data';
@@ -197,6 +198,16 @@ export default function Welaa() {
     setAuthOpen(true);
   };
   const go = (destination: string) => router.push(destination);
+  const signOut = async () => {
+    const { error: signOutError } = await supabase.auth.signOut({ scope: 'local' });
+    if (signOutError) {
+      toast.error('ออกจากระบบไม่สำเร็จ กรุณาลองอีกครั้ง');
+      return;
+    }
+    setData((current) => ({ ...current, user: null }));
+    router.replace('/');
+    toast.success('ออกจากระบบแล้ว');
+  };
 
   const act = async (body: any) => {
     if (!data.user) {
@@ -394,8 +405,40 @@ export default function Welaa() {
         <nav><Link href="/search">ค้นหาพื้นที่</Link><Link href="/#categories">หมวดหมู่</Link><Link href="/how-it-works">วิธีใช้งาน</Link></nav>
         {data.user
           ? <>
-              <Link className="account-link" href="/account"><UserRound size={17} />{data.user.name}</Link>
               <Link className="button" href="/host/new"><Plus size={17} />ปล่อยพื้นที่</Link>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className="button secondary"
+                    type="button"
+                    aria-label="เปิดเมนูบัญชี"
+                    title="เมนูบัญชี"
+                    style={{ width: 46, height: 46, padding: 0, borderRadius: 10 }}
+                  >
+                    <Menu size={21} aria-hidden="true" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  sideOffset={10}
+                  style={{ minWidth: 250, padding: 8, borderColor: '#e1e5e7', borderRadius: 12, background: '#fff', color: '#172d3e', boxShadow: '0 14px 40px #172d3e1c' }}
+                >
+                  <DropdownMenuLabel style={{ padding: '10px 12px' }}>
+                    <span style={{ display: 'block', fontWeight: 600 }}>{data.user.name}</span>
+                    <span style={{ display: 'block', color: '#72808a', fontSize: 12, fontWeight: 400, overflowWrap: 'anywhere' }}>{data.user.email}</span>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild><Link href="/account?tab=bookings"><CalendarDays />การจองของฉัน</Link></DropdownMenuItem>
+                  <DropdownMenuItem asChild><Link href="/host"><House />พื้นที่ของฉัน</Link></DropdownMenuItem>
+                  <DropdownMenuItem asChild><Link href="/account?tab=saved"><Heart />พื้นที่ที่บันทึกไว้</Link></DropdownMenuItem>
+                  <DropdownMenuItem asChild><Link href="/account?tab=profile"><UserRound />โปรไฟล์และการตั้งค่า</Link></DropdownMenuItem>
+                  <DropdownMenuItem asChild><Link href="/how-it-works"><CircleHelp />วิธีใช้งานและความช่วยเหลือ</Link></DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem variant="destructive" onSelect={(event) => { event.preventDefault(); void signOut(); }}>
+                    <LogOut />ออกจากระบบ
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </>
           : <button className="button" onClick={() => auth()}>เข้าสู่ระบบ/สมัครสมาชิก</button>}
       </header>
