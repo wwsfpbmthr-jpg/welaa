@@ -151,3 +151,5 @@
 .google-mark{position:absolute;left:16px;width:23px;height:23px;border-radius:50%;display:grid;place-items:center;background:#fff;color:#4285f4;font-weight:700;font-family:Arial,sans-serif;font-size:18px}
 .auth-divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:#7b8992;font-size:13px}
 .auth-divider:before,.auth-divider:after{content:'';height:1px;background:#e5eaed;flex:1}
+
+.host-banner-text-only{grid-template-columns:1fr}
