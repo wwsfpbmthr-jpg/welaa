@@ -205,3 +205,45 @@
 .searchbox .search-fields{background:#f1f4f6;border-radius:0 0 14px 14px}
 .searchbox .search-fields>label{border-color:#dce3e7}
 .searchbox .query{border-bottom-color:#e5eaed}
+
+/* Floating glass navigation with a shared sliding active indicator */
+@media(max-width:640px){
+  .bottom-nav{
+    display:flex;position:fixed;z-index:40;left:50%;right:auto;bottom:calc(env(safe-area-inset-bottom) + 12px);
+    transform:translateX(-50%);width:min(620px,calc(100vw - 26px));height:76px;padding:8px;gap:0;
+    align-items:stretch;justify-content:space-between;overflow:hidden;
+    border:1px solid rgba(255,255,255,.72);border-radius:999px;
+    background:rgba(248,250,252,.76);-webkit-backdrop-filter:blur(20px) saturate(175%);backdrop-filter:blur(20px) saturate(175%);
+    box-shadow:0 12px 34px rgba(23,45,62,.18),inset 0 1px 0 rgba(255,255,255,.85)
+  }
+  .bottom-nav-indicator{
+    position:absolute;z-index:0;left:8px;top:8px;bottom:8px;width:calc((100% - 16px)/5);border-radius:999px;
+    background:#172d3e;box-shadow:0 4px 14px rgba(23,45,62,.2);pointer-events:none;
+    transition:transform .38s cubic-bezier(.2,.8,.2,1),opacity .2s ease
+  }
+  .bottom-nav.active-1 .bottom-nav-indicator{transform:translateX(100%)}
+  .bottom-nav.active-2 .bottom-nav-indicator{transform:translateX(200%)}
+  .bottom-nav.active-3 .bottom-nav-indicator{transform:translateX(300%)}
+  .bottom-nav.active-4 .bottom-nav-indicator{transform:translateX(400%)}
+  .bottom-nav.no-active .bottom-nav-indicator{opacity:0}
+  .bottom-nav .bottom-nav-item{
+    position:relative;z-index:1;display:flex;flex:1;min-width:0;height:100%;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+    border-radius:999px;color:#7c8993;text-decoration:none;font-size:10px;line-height:1.15;white-space:nowrap;
+    transition:color .22s ease,transform .18s ease
+  }
+  .bottom-nav .bottom-nav-item.active{color:#fff}
+  .bottom-nav .bottom-nav-item:active{transform:scale(.96)}
+  .bottom-nav .bottom-nav-item svg{width:21px;height:21px;flex:none}
+  .bottom-nav .bottom-nav-item.add-nav svg{width:23px;height:23px;padding:0;background:transparent;color:inherit;border-radius:0}
+  .bottom-nav .bottom-nav-item:focus-visible{outline:2px solid #bf8b37;outline-offset:-3px}
+  main{padding-bottom:96px}
+}
+@media(prefers-reduced-motion:reduce){
+  .bottom-nav-indicator,.bottom-nav .bottom-nav-item{transition:none}
+}
+/* One more subtle shade on the search panel */
+.searchbox{background:#f3f6f8}
+.searchbox .query{background:#f4f7f9}
+.searchbox .search-fields{background:#eaf0f3}
+.searchbox .search-fields>label{border-color:#d7e0e5}
+.searchbox .query{border-bottom-color:#e1e8ec}
