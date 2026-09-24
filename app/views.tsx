@@ -2,33 +2,40 @@
 import {useEffect,useState} from 'react';
 import Link from 'next/link';
 import {useSearchParams} from 'next/navigation';
-import {Search,MapPin,Clock,Users,ArrowUpRight,SlidersHorizontal,Map,LayoutGrid,ShieldCheck,ArrowRight,Plus} from 'lucide-react';
+import {Search,MapPin,Clock,Users,ArrowUpRight,SlidersHorizontal,Map,LayoutGrid,ShieldCheck,Building2,Landmark,Mountain,Waves} from 'lucide-react';
 import {Slider} from '@/components/ui/slider';
 import {Dialog,DialogContent,DialogTitle,DialogDescription} from '@/components/ui/dialog';
 import {Tabs,TabsList,TabsTrigger,TabsContent} from '@/components/ui/tabs';
 import {useApp} from './context';
 import {SpaceCard,SectionHead,Categories,Choice,Check,Empty} from './ui';
-import {today,datePlus,parseSearch,money,hour,slotStatus,instantInfo,cities,types,facilities,normalizeCategory,coordinates} from './data';
+import {today,parseSearch,money,hour,slotStatus,instantInfo,cities,types,facilities,normalizeCategory,coordinates} from './data';
 export function SearchBox({compact=false}:{compact?:boolean}){const {go,all}=useApp(),p=useSearchParams();const [q,setQ]=useState(p.get('q')||''),[city,setCity]=useState(p.get('city')||'ทั้งหมด'),[date,setDate]=useState(p.get('date')||''),[start,setStart]=useState(p.get('start')||'any'),[guests,setGuests]=useState(p.get('guests')||'1');const cityOptions=[...cities,...new Set(all.map(s=>s.city).filter(c=>c&&!cities.includes(c)))];if(city!=='ทั้งหมด'&&!cityOptions.includes(city))cityOptions.push(city);function submit(e:any){e.preventDefault();const x=parseSearch(q),a=new URLSearchParams();if(q)a.set('q',q);a.set('city',x.city||city);if(x.cat!=='ทั้งหมด')a.set('cat',x.cat);if(x.date||date||x.start||start!=='any')a.set('date',x.date||date||today());if(x.start||start!=='any')a.set('start',String(x.start||start));if(x.duration)a.set('duration',String(x.duration));a.set('guests',String(x.guests||guests));go('/search?'+a)}return <form className={'searchbox '+(compact?'compact':'')} onSubmit={submit}><div className="query"><Search size={22}/><input aria-label="ค้นหาพื้นที่" value={q} onChange={e=>setQ(e.target.value)} placeholder="เช่น ห้องประชุม 6 คน หรือสตูดิโอถ่ายคลิป"/><span className="query-hint">ลอง “ห้องประชุม 6 คนช่วงบ่าย”</span></div><div className="search-fields"><label><span>สถานที่</span><Choice value={city} onChange={setCity} label="สถานที่" options={[{value:'ทั้งหมด',label:'ทุกพื้นที่'},...cityOptions]}/></label><label><span>วันที่</span><input aria-label="วันที่ค้นหา" type="date" min={today()} value={date} onChange={e=>setDate(e.target.value)}/></label><label><span>ช่วงเวลา</span><Choice value={start} onChange={setStart} label="เวลาเริ่ม" options={[{value:'any',label:'ทุกช่วงเวลา'},...Array.from({length:16},(_,i)=>({value:String(i+8),label:hour(i+8)}))]}/></label><label><span>จำนวนคน</span><input aria-label="จำนวนคน" type="number" min="1" max="500" value={guests} onChange={e=>setGuests(e.target.value)}/></label><button className="button"><Search size={18}/>ค้นหาพื้นที่</button></div></form>}
+const popularCities=[
+  {name:'กรุงเทพฯ',english:'BANGKOK',Icon:Building2},
+  {name:'เชียงใหม่',english:'CHIANG MAI',Icon:Mountain},
+  {name:'ภูเก็ต',english:'PHUKET',Icon:Waves},
+  {name:'พัทยา',english:'PATTAYA',Icon:Landmark},
+  {name:'หาดใหญ่',english:'HAT YAI',Icon:MapPin},
+];
 export function Home(){
-  const {all,data}=useApp();
-  const [category,setCategory]=useState('ทั้งหมด');
-  const current=all.filter(s=>s.activities.length>0&&instantInfo(s,data));
-  const selected=all.filter(s=>s.activities.length>0&&(category==='ทั้งหมด'||s.activities.includes(category)));const featured=selected.slice(category==='ทั้งหมด'&&selected.length>4?4:0,category==='ทั้งหมด'?12:8);
+  const {go}=useApp();
+  const category='ทั้งหมด';
   return <>
     <div className="container home-top-categories" id="categories">
-      <Categories value={category} onChange={setCategory}/>
+      <Categories value={category} onChange={next=>go(next==='ทั้งหมด'?'/search':`/search?cat=${encodeURIComponent(next)}`)}/>
     </div>
     <section className="home-search">
       <SearchBox/>
     </section>
-    {category==='ทั้งหมด'&&<section className="section">
-      <SectionHead title="ว่างตอนนี้" sub="ไอเดียพร้อมแล้ว พื้นที่ก็พร้อมเหมือนกัน" eyebrow="A LITTLE MORE SPONTANEOUS" href="/search?instant=1" live/>
-      {current.length?<div className="space-grid">{current.slice(0,4).map(s=><SpaceCard key={s.id} s={s} instant/>)}</div>:<div className="quiet-empty"><Clock size={22}/><span>ช่วงว่างวันนี้หมดแล้ว มองหาพื้นที่สำหรับพรุ่งนี้ได้เลย</span><Link href={'/search?date='+datePlus(1)}>ดูเวลาพรุ่งนี้ <ArrowRight size={16}/></Link></div>}
-    </section>}
     <section className="section">
-      <SectionHead title={category==='ทั้งหมด'?'พื้นที่น่าสนใจใกล้คุณ':`พื้นที่สำหรับ${category}`} sub="ค้นหาพื้นที่ตามกิจกรรมและช่วงเวลาที่เหมาะกับคุณ" href={'/search?cat='+encodeURIComponent(category)}/>
-      {featured.length?<div className="space-grid">{featured.map(s=><SpaceCard key={s.id} s={s}/>)}</div>:<div className="quiet-empty"><MapPin size={22}/><span>กำลังเปิดรับพื้นที่ในหมวดนี้</span><Link href="/host/new">มีพื้นที่ที่เหมาะ? ลงประกาศ <ArrowRight size={16}/></Link></div>}
+      <SectionHead title="เมืองยอดนิยม" sub="เลือกเมืองเพื่อเริ่มค้นหาพื้นที่ที่เหมาะกับคุณ"/>
+      <div className="city-grid">
+        {popularCities.map(({name,english,Icon})=><Link className="city-card" href={`/search?city=${encodeURIComponent(name)}`} key={name}>
+          <span className="city-card-icon"><Icon size={21} strokeWidth={1.7}/></span>
+          <span className="city-card-copy"><b>{name}</b><small>{english}</small></span>
+          <ArrowUpRight className="city-card-arrow" size={17}/>
+        </Link>)}
+      </div>
     </section>
     <section className="section"><div className="host-banner host-banner-text-only"><div><div className="eyebrow">YOUR SPACE, SOMEONE’S POSSIBILITY</div><h2>ห้องที่ว่าง อาจเป็นจุดเริ่มต้น<br/>ของไอเดียที่ไม่ว่าง</h2><p>ให้พื้นที่ของคุณได้ทำงาน ในเวลาที่คุณไม่ได้ใช้</p><Link href="/host/new" className="button">เริ่มปล่อยพื้นที่ <ArrowUpRight size={17}/></Link></div></div></section>
     <div className="trust-strip container"><span><ShieldCheck/>กฎชัดเจนก่อนจอง</span><span><Clock/>เช่าพื้นที่สั้น ๆ หรือเต็มวัน</span><span><Users/>พื้นที่จากคนในย่านของคุณ</span></div>
