@@ -248,41 +248,41 @@
 .searchbox .search-fields>label{border-color:#d7e0e5}
 .searchbox .query{border-bottom-color:#e1e8ec}
 
-/* Rich navy glass for search, with clear contrast for labels and inputs. */
+/* Quiet glass search panel with a navy call to action. */
 .searchbox{
-  background:rgba(33,53,69,.9);
-  border-color:rgba(111,137,153,.55);
-  -webkit-backdrop-filter:blur(18px) saturate(145%);
-  backdrop-filter:blur(18px) saturate(145%);
-  box-shadow:0 14px 34px rgba(18,39,55,.17),inset 0 1px 0 rgba(255,255,255,.12)
+  background:rgba(238,244,248,.84);
+  border-color:#dce6eb;
+  -webkit-backdrop-filter:blur(18px) saturate(135%);
+  backdrop-filter:blur(18px) saturate(135%);
+  box-shadow:0 12px 30px rgba(23,45,62,.09),inset 0 1px 0 rgba(255,255,255,.82)
 }
 .searchbox .query{
-  background:rgba(62,85,101,.72);
+  background:rgba(249,251,253,.88);
   border-radius:14px 14px 0 0;
-  border-bottom-color:rgba(214,226,233,.2);
-  color:#f6fafc
+  border-bottom-color:#dee7ec;
+  color:#172d3e
 }
-.searchbox .query>svg{color:#e6eef3}
-.searchbox .query input{color:#fff}
-.searchbox .query input::placeholder{color:#d4dfe6;opacity:1}
-.searchbox .query-hint{color:#cad9e2}
+.searchbox .query>svg{color:#243b4b}
+.searchbox .query input{color:#172d3e}
+.searchbox .query input::placeholder{color:#6b7b87;opacity:1}
+.searchbox .query-hint{color:#748694}
 .searchbox .search-fields{
-  background:rgba(31,50,65,.82);
-  color:#f7fafc
+  background:rgba(231,239,245,.76);
+  color:#172d3e
 }
-.searchbox .search-fields>label{border-color:rgba(213,227,235,.23)}
-.searchbox .search-fields label>span{color:#bdcdd7}
+.searchbox .search-fields>label{border-color:#ccd9e1}
+.searchbox .search-fields label>span{color:#657681}
 .searchbox .search-fields input,
-.searchbox .search-fields [data-slot=select-trigger]{color:#f7fafc}
-.searchbox .search-fields input::placeholder{color:#bdcdd7;opacity:1}
-.searchbox .search-fields [data-slot=select-trigger] svg{color:#d8e4eb}
+.searchbox .search-fields [data-slot=select-trigger]{color:#172d3e}
+.searchbox .search-fields input::placeholder{color:#70818c;opacity:1}
+.searchbox .search-fields [data-slot=select-trigger] svg{color:#687c88}
 .searchbox .search-fields>.button{
-  background:#102739;
-  border:1px solid rgba(221,234,241,.23);
+  background:#172d3e;
+  border:1px solid #172d3e;
   color:#fff;
-  box-shadow:0 5px 14px rgba(9,26,39,.2)
+  box-shadow:0 5px 14px rgba(23,45,62,.16)
 }
-.searchbox .search-fields>.button:hover{background:#1b394d}
+.searchbox .search-fields>.button:hover{background:#234054}
 
 @media(max-width:640px){
   .bottom-nav{
@@ -300,68 +300,55 @@
   .bottom-nav .bottom-nav-item.active{color:#fff}
 }
 
-/* Four focused ways to use WELAA. Keep every option visible without scrolling. */
-.categories{
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:12px;
-  overflow:visible;
-  padding:18px 0 20px;
-  border-bottom:0
+/* Five familiar category tabs: All plus four focused activities. */
+.categories,.home-top-categories .categories{
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  overflow-x:auto;
+  padding:22px 0 14px;
+  border-bottom:1px solid #e9edef;
+  scrollbar-width:none
 }
+.categories::-webkit-scrollbar{display:none}
 .category{
   display:flex;
-  flex-direction:row;
-  justify-content:center;
+  flex:0 0 auto;
+  flex-direction:column;
   align-items:center;
-  gap:11px;
-  width:100%;
+  justify-content:center;
+  gap:8px;
+  width:auto;
   min-width:0;
-  min-height:70px;
-  padding:14px 16px;
-  white-space:normal;
-  text-align:left;
-  font-size:14px;
-  font-weight:600;
-  line-height:1.35;
-  color:#304658;
-  background:#f5f8fa;
-  border:1px solid #dee7ec;
-  border-radius:15px;
-  box-shadow:0 3px 12px rgba(23,45,62,.035);
-  transition:background .2s ease,border-color .2s ease,box-shadow .2s ease,transform .2s ease
-}
-.category svg{width:23px;height:23px;stroke-width:1.7}
-.category:hover{background:#eef4f7;border-color:#bbcbd4;transform:translateY(-2px)}
-.category.active,.category.active:hover{
-  color:#fff;
-  background:#172d3e;
-  border-color:#172d3e;
-  box-shadow:0 8px 20px rgba(23,45,62,.18)
-}
-.category-reset{
-  grid-column:1/-1;
-  justify-self:end;
-  padding:0 4px;
+  min-height:0;
+  padding:0 7px 12px;
+  white-space:nowrap;
   font-size:12px;
-  font-weight:600;
-  color:#526b7d;
-  text-decoration:underline;
-  text-underline-offset:3px
+  font-weight:500;
+  line-height:1.35;
+  color:#6b7983;
+  background:transparent;
+  border:0;
+  border-bottom:2px solid transparent;
+  border-radius:0;
+  box-shadow:none;
+  transition:color .18s ease,border-color .18s ease
 }
-.category-reset:hover{color:#172d3e}
+.category svg{width:23px;height:23px;stroke-width:1.5}
+.category:hover{color:#172d3e;background:transparent}
+.category.active,.category.active:hover{
+  color:#172d3e;
+  background:transparent;
+  border-bottom-color:#172d3e;
+  box-shadow:none
+}
 @media(max-width:640px){
   .categories,.home-top-categories .categories{
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:9px;
-    padding:13px 0 16px
+    justify-content:space-between;
+    gap:16px;
+    padding:10px 0 12px
   }
-  .category{
-    min-height:59px;
-    padding:11px 12px;
-    gap:9px;
-    font-size:12px
-  }
+  .category{gap:6px;padding:0 3px 8px;font-size:12px}
   .category svg{width:21px;height:21px}
 }
 @media(prefers-reduced-motion:reduce){.category{transition:none}}
