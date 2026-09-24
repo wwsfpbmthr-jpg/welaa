@@ -14,6 +14,7 @@ import { Home, SearchPage, HowItWorks } from './views';
 import { Detail } from './detail';
 import { Wizard } from './wizard';
 import { Account, HostCalendar } from './account';
+import { Profile } from './profile';
 import { supabase } from '@/lib/supabase/client';
 
 function GoogleBrandMark() {
@@ -464,11 +465,12 @@ export default function Welaa() {
   else if (path === '/host/new') view = <Wizard />;
   else if (path === '/host/calendar') view = <HostCalendar />;
   else if (path === '/account' || path === '/host') view = <Account host={path === '/host'} />;
+  else if (path === '/profile') view = <Profile />;
   else if (path === '/how-it-works') view = <HowItWorks />;
   else view = <div className="page empty"><h1>ไม่พบหน้านี้</h1><Link className="button" href="/">กลับหน้าหลัก</Link></div>;
 
   return (
-    <AppContext.Provider value={{ data, all: data.spaces, ready, authReady, busy, act, refresh, auth, go, favorite }}>
+    <AppContext.Provider value={{ data, all: data.spaces, ready, authReady, busy, act, refresh, auth, go, favorite, signOut }}>
       <header className="navbar">
         <Logo />
         <nav><Link href="/search">ค้นหาพื้นที่</Link><Link href="/#categories">หมวดหมู่</Link><Link href="/how-it-works">วิธีใช้งาน</Link></nav>
@@ -528,8 +530,8 @@ export default function Welaa() {
         <Link className={path === '/' ? 'active' : ''} href="/"><Compass />สำรวจ</Link>
         <Link className={path === '/search' ? 'active' : ''} href="/search"><Search />ค้นหา</Link>
         <Link className="add-nav" href="/host/new"><Plus />ปล่อยพื้นที่</Link>
-        <Link href="/account?tab=bookings"><CalendarDays />การจอง</Link>
-        <Link href="/account"><UserRound />โปรไฟล์</Link>
+        <Link className={path === '/account' ? 'active' : ''} href="/account?tab=bookings"><CalendarDays />การจอง</Link>
+        <Link className={path === '/profile' ? 'active' : ''} href="/profile"><UserRound />โปรไฟล์</Link>
       </nav>
       <Dialog open={authOpen} onOpenChange={(open) => {
         setAuthOpen(open);
