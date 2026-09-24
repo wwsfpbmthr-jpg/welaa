@@ -198,3 +198,10 @@
 .profile-hub-signout{width:100%;margin-top:16px;justify-content:center;color:#9d3a32;border-color:#eadbd9;background:#fff}.profile-hub-signout:hover{background:#fff8f7}
 @media(max-width:800px){.profile-hub{margin:22px 18px 86px}.profile-hub-hero{flex-wrap:wrap;padding:19px}.profile-hub-shortcuts{width:100%;margin:2px 0 0}.profile-hub-shortcuts a{flex:1}.profile-hub-groups{grid-template-columns:1fr}}
 @media(max-width:480px){.profile-hub{margin:16px 14px 84px}.profile-hub-hero{gap:12px;padding:17px}.profile-hub-avatar{width:50px;height:50px;font-size:20px}.profile-hub-heading h1{font-size:21px}.profile-hub-heading p{font-size:12px}.profile-hub-counts{gap:9px}.profile-hub-count{gap:9px;padding:13px 11px}.profile-hub-count b{font-size:12px}.profile-hub-count small{font-size:11px}}
+
+/* Subtle cool tint for the search panel */
+.searchbox{background:#f7f9fa}
+.searchbox .query{background:#f7f9fa}
+.searchbox .search-fields{background:#f1f4f6;border-radius:0 0 14px 14px}
+.searchbox .search-fields>label{border-color:#dce3e7}
+.searchbox .query{border-bottom-color:#e5eaed}
