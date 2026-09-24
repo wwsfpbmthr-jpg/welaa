@@ -530,7 +530,7 @@ export default function Welaa() {
         <Link className={path === '/' ? 'active' : ''} href="/"><Compass />สำรวจ</Link>
         <Link className={path === '/search' ? 'active' : ''} href="/search"><Search />ค้นหา</Link>
         <Link className="add-nav" href="/host/new"><Plus />ปล่อยพื้นที่</Link>
-        <Link className={path === '/account' ? 'active' : ''} href="/account?tab=bookings"><CalendarDays />การจอง</Link>
+        <Link className={path === '/account' ? 'active' : ''} href="/account?tab=bookings" onClick={(event) => { if (!data.user) { event.preventDefault(); auth(); } }}><CalendarDays />การจอง</Link>
         <Link className={path === '/profile' ? 'active' : ''} href="/profile"><UserRound />โปรไฟล์</Link>
       </nav>
       <Dialog open={authOpen} onOpenChange={(open) => {
