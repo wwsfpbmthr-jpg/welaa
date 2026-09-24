@@ -1,13 +1,13 @@
 'use client';
 import {ReactNode} from 'react';
 import Link from 'next/link';
-import {Heart,Star,ArrowUpRight,Grid2X2,Video,Users,GraduationCap,PartyPopper,Music,Camera,Store,CircleDot,Laptop,Car,MapPin} from 'lucide-react';
+import {Heart,Star,ArrowUpRight,Grid2X2,Video,Users,GraduationCap,PartyPopper,Music,Camera,Store,CircleDot,Laptop,Car,BedDouble,MapPin} from 'lucide-react';
 import {Select,SelectTrigger,SelectValue,SelectContent,SelectItem} from '@/components/ui/select';
 import {Checkbox} from '@/components/ui/checkbox';
 import {categories,Space,money,hour,instantInfo} from './data';
 import {useApp} from './context';
-const icons=[Grid2X2,Video,Users,GraduationCap,PartyPopper,Music,Camera,Store,CircleDot,Laptop,Car];
-export function Logo(){return <Link className="brand" href="/"><span className="brand-mark"><img src="/logo.jpeg" alt=""/></span>WELAA<span className="brand-dot">.</span></Link>}
+const icons=[Grid2X2,Video,Users,GraduationCap,PartyPopper,Music,Camera,Store,CircleDot,Laptop,Car,BedDouble];
+export function Logo(){return <Link className="brand" href="/"><span className="brand-mark"><img src="/welaa-user-logo.svg" alt=""/></span>WELAA<span className="brand-dot">.</span></Link>}
 export function Choice({value,onChange,options,label}:{value:string;onChange:(v:string)=>void;options:(string|{value:string;label:string})[];label:string}){return <Select value={value} onValueChange={onChange}><SelectTrigger aria-label={label}><SelectValue placeholder={label}/></SelectTrigger><SelectContent>{options.map(o=><SelectItem key={typeof o==='string'?o:o.value} value={typeof o==='string'?o:o.value}>{typeof o==='string'?o:o.label}</SelectItem>)}</SelectContent></Select>}
 export function Check({checked,onChange,children}:{checked:boolean;onChange:(v:boolean)=>void;children:ReactNode}){return <label className="check-row"><Checkbox checked={checked} onCheckedChange={v=>onChange(v===true)}/><span>{children}</span></label>}
 export function Categories({value,onChange}:{value:string;onChange:(c:string)=>void}){return <div className="categories" id="categories">{categories.map((c,i)=>{const Icon=icons[i];return <button key={c} onClick={()=>onChange(c)} className={'category '+(c===value?'active':'')}><Icon/><span>{c}</span></button>})}</div>}
