@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { CalendarDays, ChevronRight, Check, CircleHelp, Clock3, Heart, House, Languages, LogOut, Mail, MessageCircle, Plus, Settings, Star, UserRound, type LucideIcon } from 'lucide-react';
 import { useApp } from './context';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
+import { useLanguage } from './language';
 
 function ProfileLink({href,icon:Icon,title,sub}: {href:string;icon:LucideIcon;title:string;sub:string}) {
   return <Link className="profile-hub-row" href={href}><Icon/><span><b>{title}</b><small>{sub}</small></span><ChevronRight/></Link>;
@@ -12,8 +13,13 @@ function ProfileLink({href,icon:Icon,title,sub}: {href:string;icon:LucideIcon;ti
 
 export function Profile() {
   const {data,authReady,auth,signOut}=useApp();
+  const {locale,setLocale}=useLanguage();
   const [settingsOpen,setSettingsOpen]=useState(false);
   const [languageOpen,setLanguageOpen]=useState(false);
+  const languageOptions=<>
+    <button className={'profile-language-option'+(locale==='th'?' active':'')} aria-pressed={locale==='th'} onClick={()=>{setLocale('th');setLanguageOpen(false)}}><span><b>ภาษาไทย</b>{locale==='th'&&<small>ใช้งานอยู่</small>}</span>{locale==='th'&&<Check/>}</button>
+    <button className={'profile-language-option'+(locale==='en'?' active':'')} aria-pressed={locale==='en'} onClick={()=>{setLocale('en');setLanguageOpen(false)}}><span><b>English</b>{locale==='en'&&<small>ใช้งานอยู่</small>}</span>{locale==='en'&&<Check/>}</button>
+  </>;
   if(!authReady) return <div className="page auth-gate" aria-busy="true"><p className="muted">กำลังตรวจสอบบัญชี…</p></div>;
   if(!data.user) return <div className="page profile-page">
     <section className="profile-hero">
@@ -29,13 +35,13 @@ export function Profile() {
       </section>
       <section className="profile-menu-group"><h2>การตั้งค่าและความช่วยเหลือ</h2>
         <button className="profile-row" onClick={()=>setSettingsOpen(true)}><Settings/><span><b>ตั้งค่า</b><small>จัดการภาษาและการตั้งค่าบัญชี</small></span><ChevronRight/></button>
-        <button className="profile-row" onClick={()=>setLanguageOpen(true)}><Languages/><span><b>ภาษา</b><small>ภาษาไทย · English เร็ว ๆ นี้</small></span><ChevronRight/></button>
+        <button className="profile-row" onClick={()=>setLanguageOpen(true)}><Languages/><span><b>ภาษา</b><small>{locale==='th'?'ภาษาไทย':'English'}</small></span><ChevronRight/></button>
         <Link className="profile-row" href="/how-it-works"><CircleHelp/><span><b>วิธีใช้งานและความปลอดภัย</b><small>รู้จักการจองและการใช้พื้นที่</small></span><ChevronRight/></Link>
         <Link className="profile-row" href="/host/new"><House/><span><b>ปล่อยพื้นที่กับ WELAA</b><small>เริ่มสร้างรายได้จากพื้นที่ว่าง</small></span><ChevronRight/></Link>
       </section>
     </div>
     <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}><DialogContent><DialogTitle>ตั้งค่า WELAA</DialogTitle><DialogDescription>จัดการการใช้งานบัญชีของคุณ</DialogDescription><button className="profile-row" onClick={()=>{setSettingsOpen(false);setLanguageOpen(true)}}><Languages/><span><b>ภาษา</b><small>ภาษาไทย</small></span><ChevronRight/></button><p className="notice">การแก้ไขข้อมูลส่วนตัวและออกจากระบบจะอยู่ในหน้าโปรไฟล์หลังเข้าสู่ระบบ</p></DialogContent></Dialog>
-    <Dialog open={languageOpen} onOpenChange={setLanguageOpen}><DialogContent><DialogTitle>เลือกภาษา</DialogTitle><DialogDescription>เลือกภาษาที่ใช้ใน WELAA</DialogDescription><button className="profile-language-option active" onClick={()=>setLanguageOpen(false)}><span><b>ภาษาไทย</b><small>ใช้งานอยู่</small></span><Check/></button><button className="profile-language-option" disabled><span><b>English</b><small>กำลังเตรียมให้บริการ</small></span></button></DialogContent></Dialog>
+    <Dialog open={languageOpen} onOpenChange={setLanguageOpen}><DialogContent><DialogTitle>เลือกภาษา</DialogTitle><DialogDescription>เลือกภาษาที่ใช้ใน WELAA</DialogDescription>{languageOptions}</DialogContent></Dialog>
   </div>;
 
   const name=data.user.name?.trim()||'สมาชิก WELAA';
@@ -75,8 +81,10 @@ export function Profile() {
       </section>
       <section className="profile-hub-group"><h2>บัญชีและการตั้งค่า</h2>
         <ProfileLink href="/account?tab=profile" icon={UserRound} title="ตั้งค่าบัญชี" sub="แก้ไขข้อมูลที่แสดงใน WELAA"/>
+        <button className="profile-hub-row" onClick={()=>setLanguageOpen(true)}><Languages/><span><b>ภาษา</b><small>{locale==='th'?'ภาษาไทย':'English'}</small></span><ChevronRight/></button>
         <button className="profile-hub-row profile-hub-signout" onClick={()=>void signOut()}><LogOut/><span><b>ออกจากระบบ</b><small>ออกจากบัญชีนี้บนอุปกรณ์</small></span><ChevronRight/></button>
       </section>
     </div>
+    <Dialog open={languageOpen} onOpenChange={setLanguageOpen}><DialogContent><DialogTitle>เลือกภาษา</DialogTitle><DialogDescription>เลือกภาษาที่ใช้ใน WELAA</DialogDescription>{languageOptions}</DialogContent></Dialog>
   </div>;
 }
