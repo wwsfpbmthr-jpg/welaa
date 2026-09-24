@@ -107,3 +107,12 @@
 @media(min-width:801px){.hero{padding-top:34px;gap:24px}.hero-copy{padding-top:23px;padding-bottom:70px}.hero-picture{height:310px}.hero h1{font-size:42px}.section{margin-top:38px}}
 
 .hero-map{background:#edf3f1}.hero-map-frame{display:block;width:100%;height:100%;border:0}.hero-map-label{position:absolute;left:16px;bottom:16px;display:flex;align-items:center;gap:7px;padding:8px 12px;border-radius:999px;background:#fff;color:#172d3e;box-shadow:0 2px 12px #142a3918;font-size:12px;pointer-events:none}.brand-mark{background:#fff;border-radius:6px}.brand-mark img{width:64px;height:64px;left:-11px;top:-12px;object-fit:cover}
+
+.home-top-categories{max-width:1312px;margin:12px auto 0;padding:0 25px}
+.home-search{max-width:1312px;margin:10px auto 0;padding:0 25px}
+.home-search .searchbox{margin:0}
+@media(max-width:640px){
+  .home-top-categories{margin:0 20px;padding:0}
+  .home-top-categories .categories{padding-top:10px;padding-bottom:12px;gap:19px}
+  .home-search{margin:12px 20px 0;padding:0}
+}
