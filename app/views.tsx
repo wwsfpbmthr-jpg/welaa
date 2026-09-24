@@ -30,7 +30,7 @@ export function Home(){
       <SectionHead title={category==='ทั้งหมด'?'พื้นที่น่าสนใจใกล้คุณ':`พื้นที่สำหรับ${category}`} sub="ค้นหาพื้นที่ตามกิจกรรมและช่วงเวลาที่เหมาะกับคุณ" href={'/search?cat='+encodeURIComponent(category)}/>
       <div className="space-grid">{selected.slice(category==='ทั้งหมด'?4:0,category==='ทั้งหมด'?12:8).map(s=><SpaceCard key={s.id} s={s}/>)}</div>
     </section>
-    <section className="section"><div className="host-banner"><div><div className="eyebrow">YOUR SPACE, SOMEONE’S POSSIBILITY</div><h2>ห้องที่ว่าง อาจเป็นจุดเริ่มต้น<br/>ของไอเดียที่ไม่ว่าง</h2><p>ให้พื้นที่ของคุณได้ทำงาน ในเวลาที่คุณไม่ได้ใช้</p><Link href="/host/new" className="button">เริ่มปล่อยพื้นที่ <ArrowUpRight size={17}/></Link></div><img src="/photos/cafe.jpg" alt="พื้นที่คาเฟ่ที่เปิดใช้ได้ตามเวลา" loading="lazy"/></div></section>
+    <section className="section"><div className="host-banner host-banner-text-only"><div><div className="eyebrow">YOUR SPACE, SOMEONE’S POSSIBILITY</div><h2>ห้องที่ว่าง อาจเป็นจุดเริ่มต้น<br/>ของไอเดียที่ไม่ว่าง</h2><p>ให้พื้นที่ของคุณได้ทำงาน ในเวลาที่คุณไม่ได้ใช้</p><Link href="/host/new" className="button">เริ่มปล่อยพื้นที่ <ArrowUpRight size={17}/></Link></div></div></section>
     <div className="trust-strip container"><span><ShieldCheck/>กฎชัดเจนก่อนจอง</span><span><Clock/>เช่าพื้นที่สั้น ๆ หรือเต็มวัน</span><span><Users/>พื้นที่จากคนในย่านของคุณ</span></div>
   </>;
 }
