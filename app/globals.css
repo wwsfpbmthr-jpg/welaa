@@ -116,3 +116,31 @@
   .home-top-categories .categories{padding-top:10px;padding-bottom:12px;gap:19px}
   .home-search{margin:12px 20px 0;padding:0}
 }
+
+.profile-page{max-width:920px;margin:34px auto 72px}
+.profile-hero{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:18px;padding:25px 28px;background:#172d3e;color:#fff;border-radius:16px}
+.profile-avatar{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:#ffffff1c;color:#fff}
+.profile-welcome .eyebrow{color:#c6d2da;margin-bottom:6px}
+.profile-welcome h1{font-size:27px;line-height:1.25;margin:0 0 6px;letter-spacing:-.4px}
+.profile-welcome p{color:#d2dbe1;font-size:14px;margin:0}
+.profile-auth-actions{display:flex;gap:9px;align-items:center}
+.profile-login{background:#fff;color:#172d3e;border-color:#fff}
+.profile-register{background:transparent;border-color:#9aabb6;color:#fff}
+.profile-menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+.profile-menu-group{background:#fff;border:1px solid #e1e7eb;border-radius:13px;overflow:hidden}
+.profile-menu-group h2{font-size:17px;margin:0;padding:18px 18px 11px;color:#172d3e}
+.profile-row{width:100%;min-height:68px;display:flex;align-items:center;gap:14px;padding:12px 17px;text-align:left;color:#172d3e;background:#fff;border-top:1px solid #edf0f2}
+.profile-row>svg:first-child{width:20px;height:20px;flex:none;color:#6e8290}
+.profile-row>span{display:flex;flex:1;min-width:0;flex-direction:column;gap:3px}
+.profile-row b{font-size:14px;font-weight:600}
+.profile-row small{font-size:12px;color:#7a8992}
+.profile-row>svg:last-child{width:17px;height:17px;flex:none;color:#9aa6ad}
+.profile-row:hover{background:#f7f9fa}
+.profile-language-option{width:100%;display:flex;align-items:center;justify-content:space-between;padding:15px;border:1px solid #e2e8ec;border-radius:9px;margin-top:10px;background:#fff;text-align:left;color:#172d3e}
+.profile-language-option span{display:flex;flex-direction:column;gap:4px}
+.profile-language-option small{color:#7d8a93;font-size:12px}
+.profile-language-option.active{border-color:#172d3e;background:#f5f8fa}
+.profile-language-option:disabled{opacity:.6;cursor:not-allowed}
+.account-settings-button{margin-left:14px}
+@media(max-width:800px){.profile-page{margin:24px 20px 76px}.profile-menu-grid{grid-template-columns:1fr}.profile-hero{grid-template-columns:auto 1fr;padding:20px;gap:14px}.profile-auth-actions{grid-column:1/-1}.profile-auth-actions .button{flex:1}.account-settings-button{margin:14px 0 0}}
+@media(max-width:480px){.profile-hero{grid-template-columns:auto 1fr;padding:18px}.profile-avatar{width:48px;height:48px}.profile-welcome h1{font-size:24px}.profile-welcome p{font-size:13px}.profile-menu-group h2{font-size:16px}}
