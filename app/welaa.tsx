@@ -71,6 +71,7 @@ function mapListing(row: any): Space {
 
 export default function Welaa() {
   const path = usePathname() || '/';
+  const activeNavIndex = path === '/' ? 0 : path === '/search' ? 1 : path === '/host/new' ? 2 : path === '/account' ? 3 : path === '/profile' || path === '/host' || path === '/host/calendar' ? 4 : -1;
   const router = useRouter();
   const [data, setData] = useState<AppData>(initial);
   const [ready, setReady] = useState(false);
@@ -526,12 +527,13 @@ export default function Welaa() {
         </div>
         <small className="prototype-note">ส่งคำขอจองให้เจ้าของยืนยัน · ยังไม่มีการเรียกเก็บเงินจริง</small>
       </footer>
-      <nav className="bottom-nav">
-        <Link className={path === '/' ? 'active' : ''} href="/"><Compass />สำรวจ</Link>
-        <Link className={path === '/search' ? 'active' : ''} href="/search"><Search />ค้นหา</Link>
-        <Link className="add-nav" href="/host/new"><Plus />ปล่อยพื้นที่</Link>
-        <Link className={path === '/account' ? 'active' : ''} href="/account?tab=bookings" onClick={(event) => { if (!data.user) { event.preventDefault(); auth(); } }}><CalendarDays />การจอง</Link>
-        <Link className={path === '/profile' ? 'active' : ''} href="/profile"><UserRound />โปรไฟล์</Link>
+      <nav className={'bottom-nav' + (activeNavIndex < 0 ? ' no-active' : ' active-' + activeNavIndex)} aria-label="เมนูหลัก">
+        <span className="bottom-nav-indicator" aria-hidden="true" />
+        <Link className={'bottom-nav-item' + (activeNavIndex === 0 ? ' active' : '')} href="/"><Compass />สำรวจ</Link>
+        <Link className={'bottom-nav-item' + (activeNavIndex === 1 ? ' active' : '')} href="/search"><Search />ค้นหา</Link>
+        <Link className={'bottom-nav-item add-nav' + (activeNavIndex === 2 ? ' active' : '')} href="/host/new"><Plus />ปล่อยพื้นที่</Link>
+        <Link className={'bottom-nav-item' + (activeNavIndex === 3 ? ' active' : '')} href="/account?tab=bookings" onClick={(event) => { if (!data.user) { event.preventDefault(); auth(); } }}><CalendarDays />การจอง</Link>
+        <Link className={'bottom-nav-item' + (activeNavIndex === 4 ? ' active' : '')} href="/profile"><UserRound />โปรไฟล์</Link>
       </nav>
       <Dialog open={authOpen} onOpenChange={(open) => {
         setAuthOpen(open);
