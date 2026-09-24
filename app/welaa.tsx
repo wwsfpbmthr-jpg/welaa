@@ -434,7 +434,7 @@ export default function Welaa() {
                   <DropdownMenuItem asChild><Link href="/account?tab=profile"><UserRound />โปรไฟล์และการตั้งค่า</Link></DropdownMenuItem>
                   <DropdownMenuItem asChild><Link href="/how-it-works"><CircleHelp />วิธีใช้งานและความช่วยเหลือ</Link></DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem variant="destructive" onSelect={(event) => { event.preventDefault(); void signOut(); }}>
+                  <DropdownMenuItem variant="destructive" onSelect={() => { void signOut(); }}>
                     <LogOut />ออกจากระบบ
                   </DropdownMenuItem>
                 </DropdownMenuContent>
