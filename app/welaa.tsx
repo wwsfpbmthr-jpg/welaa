@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Plus, Search, Compass, CalendarDays, UserRound, ArrowUpRight, ShieldCheck, Menu, House, Heart, CircleHelp, LogOut } from 'lucide-react';
+import { Plus, Search, Compass, CalendarDays, UserRound, ArrowUpRight, ShieldCheck, Menu, House, Heart, CircleHelp, LogOut, Mail, ChevronDown } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Toaster, toast } from 'sonner';
@@ -81,6 +81,7 @@ export default function Welaa() {
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [authMessage, setAuthMessage] = useState('');
+  const [emailAuthOpen, setEmailAuthOpen] = useState(false);
 
   const refresh = useCallback(async () => {
     try {
@@ -211,6 +212,7 @@ export default function Welaa() {
   const auth = (v = false) => {
     setRegister(v);
     setAuthMessage('');
+    setEmailAuthOpen(false);
     setAuthOpen(true);
   };
   const go = (destination: string) => router.push(destination);
@@ -477,21 +479,45 @@ export default function Welaa() {
         <Link href="/account?tab=bookings"><CalendarDays />การจอง</Link>
         <Link href="/account"><UserRound />โปรไฟล์</Link>
       </nav>
-      <Dialog open={authOpen} onOpenChange={setAuthOpen}>
-        <DialogContent>
+      <Dialog open={authOpen} onOpenChange={(open) => {
+        setAuthOpen(open);
+        if (!open) {
+          setEmailAuthOpen(false);
+          setAuthMessage('');
+        }
+      }}>
+        <DialogContent className="auth-dialog">
           <Logo />
           <DialogTitle className="auth-title">{register ? 'เริ่มต้นเวลาดี ๆ กับ WELAA' : 'ยินดีต้อนรับกลับ'}</DialogTitle>
           <DialogDescription>บัญชีเดียวสำหรับผู้เช่าและเจ้าของพื้นที่</DialogDescription>
-          <button className="button full google-button mt" type="button" onClick={() => signInWithProvider('google')} disabled={busy}><GoogleBrandMark />ดำเนินการต่อด้วย Google</button>
-          <button className="button full facebook-button mt" type="button" onClick={() => signInWithProvider('facebook')} disabled={busy}><FacebookBrandMark />ดำเนินการต่อด้วย Facebook</button>
-          <div className="auth-divider"><span>หรือใช้อีเมล</span></div>
-          <form className="stack" onSubmit={submitAuth}>
-            {register && <label className="field">ชื่อที่แสดง<input required maxLength={80} value={authName} onChange={(e) => setAuthName(e.target.value)} autoComplete="name" /></label>}
-            <label className="field">อีเมล<input required type="email" value={authEmail} onChange={(e) => setAuthEmail(e.target.value)} autoComplete="email" /></label>
-            <label className="field">รหัสผ่าน<input required type="password" minLength={8} value={authPassword} onChange={(e) => setAuthPassword(e.target.value)} autoComplete={register ? 'new-password' : 'current-password'} /></label>
-            {authMessage && <p className="notice">{authMessage}</p>}
-            <button className="button full" disabled={busy}>{busy ? 'กำลังดำเนินการ…' : register ? 'สมัครสมาชิก' : 'เข้าสู่ระบบ'}<ArrowUpRight size={18} /></button>
-          </form>
+          <div className="auth-provider-list">
+            <button className="button full google-button" type="button" onClick={() => signInWithProvider('google')} disabled={busy}><GoogleBrandMark />ดำเนินการต่อด้วย Google</button>
+            <button className="button full facebook-button" type="button" onClick={() => signInWithProvider('facebook')} disabled={busy}><FacebookBrandMark />ดำเนินการต่อด้วย Facebook</button>
+          </div>
+          {authMessage && !emailAuthOpen && <p className="notice auth-provider-message">{authMessage}</p>}
+          <div className="auth-divider auth-divider-compact"><span>หรือ</span></div>
+          <button
+            className="email-auth-toggle"
+            type="button"
+            aria-expanded={emailAuthOpen}
+            onClick={() => {
+              setEmailAuthOpen((open) => !open);
+              setAuthMessage('');
+            }}
+          >
+            <Mail size={17} />
+            <span>ใช้อีเมล{emailAuthOpen ? '' : 'แทน'}</span>
+            <ChevronDown className={emailAuthOpen ? 'email-auth-chevron open' : 'email-auth-chevron'} size={17} />
+          </button>
+          {emailAuthOpen && (
+            <form className="stack auth-email-form" onSubmit={submitAuth}>
+              {register && <label className="field">ชื่อที่แสดง<input required maxLength={80} value={authName} onChange={(e) => setAuthName(e.target.value)} autoComplete="name" /></label>}
+              <label className="field">อีเมล<input required type="email" value={authEmail} onChange={(e) => setAuthEmail(e.target.value)} autoComplete="email" /></label>
+              <label className="field">รหัสผ่าน<input required type="password" minLength={8} value={authPassword} onChange={(e) => setAuthPassword(e.target.value)} autoComplete={register ? 'new-password' : 'current-password'} /></label>
+              {authMessage && <p className="notice">{authMessage}</p>}
+              <button className="button full" disabled={busy}>{busy ? 'กำลังดำเนินการ…' : register ? 'สมัครสมาชิก' : 'เข้าสู่ระบบ'}<ArrowUpRight size={18} /></button>
+            </form>
+          )}
           <button className="text-link mt" onClick={() => { setRegister(!register); setAuthMessage(''); }}>{register ? 'มีบัญชีแล้ว? เข้าสู่ระบบ' : 'ยังไม่มีบัญชี? สมัครสมาชิก'}</button>
           <p className="small muted mt">การจองเป็นคำขอรอเจ้าของยืนยัน และยังไม่มีการชำระเงินจริง</p>
         </DialogContent>
