@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Plus, Search, Compass, CalendarDays, UserRound, ArrowUpRight, ShieldCheck, Menu, House, Heart, CircleHelp, LogOut, Mail, ChevronDown } from 'lucide-react';
@@ -73,6 +73,8 @@ export default function Welaa() {
   const router = useRouter();
   const [data, setData] = useState<AppData>(initial);
   const [ready, setReady] = useState(false);
+  const [authReady, setAuthReady] = useState(false);
+  const authRevision = useRef(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [authOpen, setAuthOpen] = useState(false);
@@ -84,12 +86,15 @@ export default function Welaa() {
   const [emailAuthOpen, setEmailAuthOpen] = useState(false);
 
   const refresh = useCallback(async () => {
+    const requestRevision = authRevision.current;
     try {
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       if (sessionError) throw sessionError;
       const authResult = sessionData.session ? await supabase.auth.getUser() : null;
       if (authResult?.error) throw authResult.error;
       const user = authResult?.data.user ?? null;
+      if (requestRevision !== authRevision.current) return;
+      setAuthReady(true);
 
       let profile: any = null;
       if (user) {
@@ -182,29 +187,70 @@ export default function Welaa() {
         reviews: [],
         draft: typeof window === 'undefined' ? null : JSON.parse(window.localStorage.getItem('welaa-draft') || 'null'),
       };
+      if (requestRevision !== authRevision.current) return;
       setData(nextData);
       setError('');
+      setReady(true);
     } catch (e: any) {
-      const message = e?.message || 'โหลดข้อมูลไม่สำเร็จ';
-      if (e?.name === 'AuthSessionMissingError' || /auth session missing/i.test(message)) {
-        setData((current) => ({ ...current, user: null }));
-        setError('');
-      } else {
-        setError(message);
+      if (requestRevision === authRevision.current) {
+        const message = e?.message || 'โหลดข้อมูลไม่สำเร็จ';
+        if (e?.name === 'AuthSessionMissingError' || /auth session missing/i.test(message)) {
+          // Only an explicit auth event may sign the user out. A transient Auth API
+          // response must not make protected pages flash their logged-out state.
+          setError('');
+        } else {
+          setError(message);
+        }
+        setReady(true);
       }
     } finally {
-      setReady(true);
+      setAuthReady(true);
     }
   }, []);
 
   useEffect(() => {
-    void refresh();
-    const timer = window.setInterval(() => void refresh(), 60000);
-    const { data: authState } = supabase.auth.onAuthStateChange(() => {
+    const { data: authState } = supabase.auth.onAuthStateChange((event, session) => {
+      authRevision.current += 1;
+      const authUser = session?.user;
+      if (authUser) {
+        setData((current) => {
+          const sameUser = current.user?.id === authUser.id;
+          const metadataName = authUser.user_metadata?.display_name ?? authUser.user_metadata?.full_name;
+          const fallbackName = authUser.email?.split('@')[0] ?? 'สมาชิก';
+          return {
+            ...current,
+            user: {
+              id: authUser.id,
+              email: authUser.email ?? current.user?.email ?? '',
+              name: sameUser ? current.user!.name : metadataName ?? fallbackName,
+              phone: sameUser ? current.user!.phone : authUser.phone ?? '',
+              bio: sameUser ? current.user!.bio : '',
+            },
+            ...(current.user && !sameUser
+              ? { spaces: current.spaces.filter((space) => !space.owner), bookings: [], favorites: [], messages: [], reviews: [] }
+              : {}),
+          };
+        });
+      } else if (event === 'SIGNED_OUT' || event === 'INITIAL_SESSION') {
+        setData((current) => ({
+          ...current,
+          user: null,
+          spaces: current.spaces.filter((space) => !space.owner),
+          bookings: [],
+          favorites: [],
+          messages: [],
+          reviews: [],
+          draft: null,
+        }));
+      }
+      if (event === 'INITIAL_SESSION' || event === 'SIGNED_OUT' || authUser) setAuthReady(true);
       window.setTimeout(() => void refresh(), 0);
     });
+    const handleFocus = () => void refresh();
+    window.addEventListener('focus', handleFocus);
+    void refresh();
     return () => {
-      window.clearInterval(timer);
+      window.removeEventListener('focus', handleFocus);
       authState.subscription.unsubscribe();
     };
   }, [refresh]);
@@ -222,7 +268,9 @@ export default function Welaa() {
       toast.error('ออกจากระบบไม่สำเร็จ กรุณาลองอีกครั้ง');
       return;
     }
-    setData((current) => ({ ...current, user: null }));
+    authRevision.current += 1;
+    setData((current) => ({ ...current, user: null, spaces: current.spaces.filter((space) => !space.owner), bookings: [], favorites: [], messages: [], reviews: [], draft: null }));
+    setAuthReady(true);
     router.replace('/');
     toast.success('ออกจากระบบแล้ว');
   };
@@ -418,11 +466,13 @@ export default function Welaa() {
   else view = <div className="page empty"><h1>ไม่พบหน้านี้</h1><Link className="button" href="/">กลับหน้าหลัก</Link></div>;
 
   return (
-    <AppContext.Provider value={{ data, all: data.spaces, ready, busy, act, refresh, auth, go, favorite }}>
+    <AppContext.Provider value={{ data, all: data.spaces, ready, authReady, busy, act, refresh, auth, go, favorite }}>
       <header className="navbar">
         <Logo />
         <nav><Link href="/search">ค้นหาพื้นที่</Link><Link href="/#categories">หมวดหมู่</Link><Link href="/how-it-works">วิธีใช้งาน</Link></nav>
-        {data.user
+        {!authReady
+          ? <span aria-hidden="true" style={{ display: 'inline-block', width: 46, height: 46, flexShrink: 0 }} />
+          : data.user
           ? <>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
