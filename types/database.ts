@@ -262,6 +262,16 @@ export type Database = {
     }
     Functions: {
       cancel_booking: { Args: { p_booking_id: string }; Returns: undefined }
+      manage_listing_availability: {
+        Args: {
+          p_date: string
+          p_hourly_price: number
+          p_hours: number[]
+          p_listing_id: string
+          p_mode: string
+        }
+        Returns: undefined
+      }
       request_booking: {
         Args: {
           p_date: string
