@@ -75,6 +75,7 @@ export default function Welaa() {
   const [ready, setReady] = useState(false);
   const [authReady, setAuthReady] = useState(false);
   const authRevision = useRef(0);
+  const refreshRequest = useRef(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [authOpen, setAuthOpen] = useState(false);
@@ -87,13 +88,14 @@ export default function Welaa() {
 
   const refresh = useCallback(async () => {
     const requestRevision = authRevision.current;
+    const requestId = ++refreshRequest.current;
     try {
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       if (sessionError) throw sessionError;
       const authResult = sessionData.session ? await supabase.auth.getUser() : null;
       if (authResult?.error) throw authResult.error;
       const user = authResult?.data.user ?? null;
-      if (requestRevision !== authRevision.current) return;
+      if (requestRevision !== authRevision.current || requestId !== refreshRequest.current) return;
       setAuthReady(true);
 
       let profile: any = null;
@@ -187,12 +189,12 @@ export default function Welaa() {
         reviews: [],
         draft: typeof window === 'undefined' ? null : JSON.parse(window.localStorage.getItem('welaa-draft') || 'null'),
       };
-      if (requestRevision !== authRevision.current) return;
+      if (requestRevision !== authRevision.current || requestId !== refreshRequest.current) return;
       setData(nextData);
       setError('');
       setReady(true);
     } catch (e: any) {
-      if (requestRevision === authRevision.current) {
+      if (requestRevision === authRevision.current && requestId === refreshRequest.current) {
         const message = e?.message || 'โหลดข้อมูลไม่สำเร็จ';
         if (e?.name === 'AuthSessionMissingError' || /auth session missing/i.test(message)) {
           // Only an explicit auth event may sign the user out. A transient Auth API
