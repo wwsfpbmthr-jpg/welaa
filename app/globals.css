@@ -172,3 +172,16 @@
 .profile-page .profile-row small{color:#7a8992;font-size:12px}
 @media(max-width:800px){.profile-page{margin:24px 20px 76px}.profile-page .profile-hero{grid-template-columns:auto minmax(0,1fr);gap:14px;padding:20px}.profile-page .profile-auth-actions{grid-column:1/-1}.profile-page .profile-auth-actions .button{flex:1}.profile-page .profile-menu-grid{grid-template-columns:1fr}}
 @media(max-width:480px){.profile-page .profile-hero{padding:18px}.profile-page .profile-avatar{width:48px;height:48px}.profile-page .profile-welcome h1{font-size:24px}.profile-page .profile-welcome p{font-size:13px}.profile-page .profile-menu-group h2{font-size:16px}}
+
+/* Keep sign-in provider buttons on WELAA navy while preserving brand SVG colors. */
+.auth-provider-list{display:grid;gap:10px;margin:20px 0 0}
+.auth-dialog .google-button,.auth-dialog .facebook-button{min-height:48px;position:relative;justify-content:center;background:#172d3e;color:#fff;border:1px solid #314657}
+.auth-dialog .google-button:hover,.auth-dialog .facebook-button:hover{background:#203b50}
+.auth-dialog .google-button:disabled,.auth-dialog .facebook-button:disabled{opacity:.6}
+.auth-provider-message{margin-top:12px}
+.auth-divider-compact{margin:16px 0 10px}
+.email-auth-toggle{display:flex;width:100%;min-height:42px;align-items:center;justify-content:center;gap:8px;padding:9px 13px;border:1px solid #dce3e7;border-radius:8px;background:#f7f9fa;color:#172d3e;font-size:14px;font-weight:500}
+.email-auth-toggle:hover{background:#edf2f5}
+.email-auth-chevron{transition:transform .18s ease}
+.email-auth-chevron.open{transform:rotate(180deg)}
+.auth-email-form{margin-top:14px;padding-top:16px;border-top:1px solid #e7ecef}
