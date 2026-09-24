@@ -354,6 +354,21 @@ export default function Welaa() {
     }
   };
 
+  const signInWithGoogle = async () => {
+    setBusy(true);
+    setAuthMessage('');
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: `${window.location.origin}${path}` },
+      });
+      if (error) throw error;
+    } catch (e: any) {
+      setAuthMessage(e?.message || 'เข้าสู่ระบบด้วย Google ไม่สำเร็จ');
+      setBusy(false);
+    }
+  };
+
   let view;
   if (path === '/') view = <Home />;
   else if (path === '/search') view = <SearchPage />;
@@ -398,7 +413,9 @@ export default function Welaa() {
           <Logo />
           <DialogTitle className="auth-title">{register ? 'เริ่มต้นเวลาดี ๆ กับ WELAA' : 'ยินดีต้อนรับกลับ'}</DialogTitle>
           <DialogDescription>บัญชีเดียวสำหรับผู้เช่าและเจ้าของพื้นที่</DialogDescription>
-          <form className="stack mt" onSubmit={submitAuth}>
+          <button className="button full google-button mt" type="button" onClick={signInWithGoogle} disabled={busy}><span className="google-mark" aria-hidden="true">G</span>ดำเนินการต่อด้วย Google</button>
+          <div className="auth-divider"><span>หรือใช้อีเมล</span></div>
+          <form className="stack" onSubmit={submitAuth}>
             {register && <label className="field">ชื่อที่แสดง<input required maxLength={80} value={authName} onChange={(e) => setAuthName(e.target.value)} autoComplete="name" /></label>}
             <label className="field">อีเมล<input required type="email" value={authEmail} onChange={(e) => setAuthEmail(e.target.value)} autoComplete="email" /></label>
             <label className="field">รหัสผ่าน<input required type="password" minLength={8} value={authPassword} onChange={(e) => setAuthPassword(e.target.value)} autoComplete={register ? 'new-password' : 'current-password'} /></label>
