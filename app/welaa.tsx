@@ -7,7 +7,7 @@ import { Plus, Search, Compass, CalendarDays, UserRound, ArrowUpRight, ShieldChe
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Toaster, toast } from 'sonner';
 import { AppContext } from './context';
-import { AppData, Space, initial, coordinates, datePlus } from './data';
+import { AppData, Space, initial, coordinates, datePlus, today } from './data';
 import { Logo } from './ui';
 import { Home, SearchPage, HowItWorks } from './views';
 import { Detail } from './detail';
@@ -92,7 +92,7 @@ export default function Welaa() {
           .from('availability')
           .select('listing_id,available_date,hour,hourly_price,is_open')
           .in('listing_id', ids)
-          .gte('available_date', new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Bangkok' }))
+          .gte('available_date', today())
           .lte('available_date', datePlus(180));
         if (result.error) throw result.error;
         availabilityRows = result.data ?? [];
