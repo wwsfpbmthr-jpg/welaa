@@ -299,3 +299,69 @@
   .bottom-nav .bottom-nav-item{color:#536879}
   .bottom-nav .bottom-nav-item.active{color:#fff}
 }
+
+/* Four focused ways to use WELAA. Keep every option visible without scrolling. */
+.categories{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+  overflow:visible;
+  padding:18px 0 20px;
+  border-bottom:0
+}
+.category{
+  display:flex;
+  flex-direction:row;
+  justify-content:center;
+  align-items:center;
+  gap:11px;
+  width:100%;
+  min-width:0;
+  min-height:70px;
+  padding:14px 16px;
+  white-space:normal;
+  text-align:left;
+  font-size:14px;
+  font-weight:600;
+  line-height:1.35;
+  color:#304658;
+  background:#f5f8fa;
+  border:1px solid #dee7ec;
+  border-radius:15px;
+  box-shadow:0 3px 12px rgba(23,45,62,.035);
+  transition:background .2s ease,border-color .2s ease,box-shadow .2s ease,transform .2s ease
+}
+.category svg{width:23px;height:23px;stroke-width:1.7}
+.category:hover{background:#eef4f7;border-color:#bbcbd4;transform:translateY(-2px)}
+.category.active,.category.active:hover{
+  color:#fff;
+  background:#172d3e;
+  border-color:#172d3e;
+  box-shadow:0 8px 20px rgba(23,45,62,.18)
+}
+.category-reset{
+  grid-column:1/-1;
+  justify-self:end;
+  padding:0 4px;
+  font-size:12px;
+  font-weight:600;
+  color:#526b7d;
+  text-decoration:underline;
+  text-underline-offset:3px
+}
+.category-reset:hover{color:#172d3e}
+@media(max-width:640px){
+  .categories,.home-top-categories .categories{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:9px;
+    padding:13px 0 16px
+  }
+  .category{
+    min-height:59px;
+    padding:11px 12px;
+    gap:9px;
+    font-size:12px
+  }
+  .category svg{width:21px;height:21px}
+}
+@media(prefers-reduced-motion:reduce){.category{transition:none}}

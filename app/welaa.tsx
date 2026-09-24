@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/compone
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Toaster, toast } from 'sonner';
 import { AppContext } from './context';
-import { AppData, Space, initial, coordinates, datePlus, today } from './data';
+import { AppData, Space, initial, coordinates, datePlus, today, normalizeActivities } from './data';
 import { Logo } from './ui';
 import { Home, SearchPage, HowItWorks } from './views';
 import { Detail } from './detail';
@@ -54,7 +54,7 @@ function mapListing(row: any): Space {
     reviews: 0,
     image: images[0] ?? '/favicon.svg',
     images,
-    activities: row.activities ?? [],
+    activities: normalizeActivities(row.activities ?? []),
     amenities: row.amenities ?? [],
     description: row.description ?? '',
     host: row.host_display_name,
