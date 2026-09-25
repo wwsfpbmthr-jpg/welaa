@@ -1,4 +1,4 @@
-export type Space={id:string;name:string;type:string;area:string;city:string;price:number;guests:number;rating:number;reviews:number;image:string;images?:string[];activities:string[];amenities:string[];description:string;host:string;distance:number;lat:number;lng:number;open:number;close:number;instant:boolean;owner?:string;rules:string;date?:string};
+export type Space={id:string;name:string;type:string;area:string;city:string;price:number;guests:number;rating:number;reviews:number;image:string;images?:string[];activities:string[];amenities:string[];description:string;host:string;distance:number;lat:number;lng:number;open:number;close:number;instant:boolean;owner?:string;status?:string;rules:string;date?:string};
 export const categories=['ประชุม','ถ่าย Content','เวิร์กช็อป','จัดกิจกรรม'] as const;
 export const types=['ห้องประชุม','ห้องทำงาน','สตูดิโอ','ห้องเวิร์กช็อป','ห้องอเนกประสงค์','พื้นที่จัดกิจกรรม','คาเฟ่','ดาดฟ้า','สวน'];
 export const cities=['กรุงเทพฯ','เชียงใหม่','ภูเก็ต','พัทยา','หาดใหญ่'];

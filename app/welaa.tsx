@@ -65,6 +65,7 @@ function mapListing(row: any): Space {
     close: row.close_hour,
     instant: false,
     owner: row.owner_id,
+    status: row.status,
     rules: row.rules ?? '',
   };
 }
