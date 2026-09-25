@@ -15,6 +15,7 @@ import { Detail } from './detail';
 import { Wizard } from './wizard';
 import { Account, HostCalendar } from './account';
 import { Profile } from './profile';
+import { Admin } from './admin';
 import { supabase } from '@/lib/supabase/client';
 
 function GoogleBrandMark() {
@@ -468,6 +469,7 @@ export default function Welaa() {
   else if (path === '/host/calendar') view = <HostCalendar />;
   else if (path === '/account' || path === '/host') view = <Account host={path === '/host'} />;
   else if (path === '/profile') view = <Profile />;
+  else if (path === '/admin') view = <Admin />;
   else if (path === '/how-it-works') view = <HowItWorks />;
   else view = <div className="page empty"><h1>ไม่พบหน้านี้</h1><Link className="button" href="/">กลับหน้าหลัก</Link></div>;
 
@@ -501,6 +503,7 @@ export default function Welaa() {
                     <span style={{ display: 'block', fontWeight: 600 }}>{data.user.name}</span>
                     <span style={{ display: 'block', color: '#72808a', fontSize: 12, fontWeight: 400, overflowWrap: 'anywhere' }}>{data.user.email}</span>
                   </DropdownMenuLabel>
+                  {data.user.id==='49683930-be71-418a-8bd2-2513362ea846'&&<DropdownMenuItem asChild><Link href="/admin"><ShieldCheck/>ศูนย์จัดการ CEO</Link></DropdownMenuItem>}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild><Link href="/account?tab=bookings"><CalendarDays />การจองของฉัน</Link></DropdownMenuItem>
                   <DropdownMenuItem asChild><Link href="/host"><House />พื้นที่ของฉัน</Link></DropdownMenuItem>
