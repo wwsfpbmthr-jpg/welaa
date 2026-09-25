@@ -506,3 +506,48 @@
 @media(prefers-reduced-motion:reduce){
   .home-cities .city-card,.home-cities .city-card-image{transition:none}
 }
+
+
+/* Compact mobile hero and a readable, swipeable city row. */
+.hero-searchbox .search-more{display:none}
+.home-cities .city-grid{
+  display:flex;grid-template-columns:none;grid-auto-flow:initial;grid-auto-columns:auto;
+  overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:x mandatory;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch
+}
+.home-cities .city-card{flex:0 0 clamp(230px,29%,355px)}
+@media(max-width:1000px){
+  .home-cities .city-card{flex-basis:clamp(230px,42%,330px)}
+}
+@media(max-width:640px){
+  .home-hero{min-height:398px}
+  .home-hero:has(.hero-searchbox.advanced-open){min-height:456px}
+  .home-hero-content{padding:25px 23px 0}
+  .home-hero-content h1{font-size:27px;line-height:1.34}
+  .home-search{width:calc(100% - 36px);bottom:14px}
+  .hero-searchbox .query{min-height:45px;padding:9px 13px}
+  .home-search .hero-searchbox .search-fields{
+    grid-template-columns:repeat(2,minmax(0,1fr));gap:0;padding:7px 9px 9px
+  }
+  .home-search .hero-searchbox .search-fields>label{min-height:52px}
+  .home-search .hero-searchbox .search-fields>label:nth-child(3),
+  .home-search .hero-searchbox .search-fields>label:nth-child(4){display:none}
+  .home-search .hero-searchbox.advanced-open .search-fields>label:nth-child(3),
+  .home-search .hero-searchbox.advanced-open .search-fields>label:nth-child(4){
+    display:block;min-height:51px;padding:6px 8px 2px;border-top:1px solid #e2e8eb
+  }
+  .home-search .hero-searchbox.advanced-open .search-fields>label:nth-child(3)>span,
+  .home-search .hero-searchbox.advanced-open .search-fields>label:nth-child(4)>span{
+    display:block;margin-bottom:2px
+  }
+  .home-search .hero-searchbox .search-fields>.button{
+    grid-column:1/-1;grid-row:auto;order:2;margin:7px 0 0;min-height:42px
+  }
+  .home-search .hero-searchbox .search-more{
+    display:block;grid-column:1/-1;grid-row:auto;order:3;width:100%;
+    padding:8px 2px 0;color:#536b7a;font-size:11px;text-align:center;
+    text-decoration:underline;text-underline-offset:3px
+  }
+  .home-cities .city-grid{display:flex;gap:12px;margin:0 -20px 0 0;padding:2px 20px 8px 0}
+  .home-cities .city-card{flex:0 0 min(74vw,310px);height:158px}
+}
