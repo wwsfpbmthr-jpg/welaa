@@ -1,0 +1,106 @@
+/* WELAA type system: a calm Thai-first voice, with restrained Latin accents. */
+@theme inline {
+  --font-sans: "Noto Sans Thai", system-ui, sans-serif;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  font-family: "Noto Sans Thai", system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.65;
+  font-weight: 400;
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button, input, textarea, select {
+  font-family: inherit;
+  letter-spacing: 0;
+}
+
+h1, h2, h3, h4 {
+  font-family: inherit;
+  letter-spacing: 0;
+  line-height: 1.5;
+  font-weight: 600;
+  text-wrap: pretty;
+}
+
+p, li { overflow-wrap: break-word; }
+
+/* The name is a wordmark; Latin section labels stay secondary to Thai titles. */
+.brand, .eyebrow, .home-hero-eyebrow,
+.city-card-copy small, .image-caption {
+  font-family: "DM Sans", "Noto Sans Thai", sans-serif;
+}
+
+.eyebrow, .home-hero-eyebrow {
+  letter-spacing: .12em;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.brand { letter-spacing: -.045em; line-height: 1.12; }
+
+.page-title {
+  font-size: clamp(26px, 3vw, 34px);
+  font-weight: 600;
+  line-height: 1.48;
+  letter-spacing: 0;
+}
+
+.section-head h2, .home-cities .section-head h2 {
+  font-size: clamp(22px, 2.4vw, 28px);
+  line-height: 1.5;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.section-head p, .home-cities .section-head p,
+.host-banner p, .profile-hub-row small,
+.profile-row small {
+  line-height: 1.65;
+}
+
+.home-hero-content .home-hero-caption {
+  letter-spacing: 0;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+.host-banner h2 { letter-spacing: 0; line-height: 1.55; font-weight: 600; }
+.city-card-copy b { line-height: 1.5; font-weight: 600; }
+.category { font-weight: 500; line-height: 1.5; }
+.category.active { font-weight: 600; }
+.card-title h3 { line-height: 1.5; }
+.button { font-weight: 600; line-height: 1.5; }
+
+.profile-hub-heading h1, .profile-page h1,
+.profile-page .profile-menu-group h2 {
+  letter-spacing: 0;
+  line-height: 1.5;
+}
+
+.admin-page h1, .admin-page h2, .admin-page h3,
+.admin-state h1 {
+  font-family: inherit;
+  letter-spacing: 0;
+  line-height: 1.55;
+}
+.admin-page .eyebrow { font-family: "DM Sans", "Noto Sans Thai", sans-serif; }
+.admin-tabs button, .admin-stats small, .admin-record-copy p,
+.admin-record-copy small { line-height: 1.6; }
+
+@media (max-width: 640px) {
+  .page-title { font-size: 27px; }
+  .section-head h2, .home-cities .section-head h2 { font-size: 22px; }
+  .home-hero-content .home-hero-caption { line-height: 1.6; }
+  .category { font-size: 12px; }
+  .bottom-nav-item { line-height: 1.45; }
+  .admin-page h1 { font-size: 25px; }
+}
