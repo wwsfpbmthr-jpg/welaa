@@ -551,3 +551,23 @@
   .home-cities .city-grid{display:flex;gap:12px;margin:0 -20px 0 0;padding:2px 20px 8px 0}
   .home-cities .city-card{flex:0 0 min(74vw,310px);height:158px}
 }
+
+
+/* Shorter opening message keeps the search close to the top of the image. */
+.home-hero{min-height:348px}
+.home-hero-content{padding:28px 42px 0}
+.home-hero-content .home-hero-caption{
+  margin:9px 0 0;color:#fff;font-size:15px;font-weight:400;
+  letter-spacing:0;line-height:1.7
+}
+@media(max-width:1000px){
+  .home-hero{min-height:365px}
+  .home-hero-content{padding:28px 30px 0}
+  .home-search .hero-searchbox .search-fields>.button{grid-row:auto}
+}
+@media(max-width:640px){
+  .home-hero{min-height:330px}
+  .home-hero:has(.hero-searchbox.advanced-open){min-height:405px}
+  .home-hero-content{padding:24px 23px 0}
+  .home-hero-content .home-hero-caption{font-size:13px;margin:7px 0 0}
+}
