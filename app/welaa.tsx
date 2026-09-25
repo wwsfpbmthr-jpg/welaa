@@ -78,6 +78,7 @@ export default function Welaa() {
   const [data, setData] = useState<AppData>(initial);
   const [ready, setReady] = useState(false);
   const [authReady, setAuthReady] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const authRevision = useRef(0);
   const refreshRequest = useRef(0);
   const [busy, setBusy] = useState(false);
@@ -89,6 +90,18 @@ export default function Welaa() {
   const [authPassword, setAuthPassword] = useState('');
   const [authMessage, setAuthMessage] = useState('');
   const [emailAuthOpen, setEmailAuthOpen] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    if (!data.user) {
+      setIsAdmin(false);
+      return () => { active = false; };
+    }
+    setIsAdmin(false);
+    (supabase as any).from('admin_members').select('user_id').eq('user_id', data.user.id).maybeSingle()
+      .then(({ data: membership }: { data: unknown }) => { if (active) setIsAdmin(!!membership); });
+    return () => { active = false; };
+  }, [data.user?.id]);
 
   const refresh = useCallback(async () => {
     const requestRevision = authRevision.current;
@@ -503,7 +516,7 @@ export default function Welaa() {
                     <span style={{ display: 'block', fontWeight: 600 }}>{data.user.name}</span>
                     <span style={{ display: 'block', color: '#72808a', fontSize: 12, fontWeight: 400, overflowWrap: 'anywhere' }}>{data.user.email}</span>
                   </DropdownMenuLabel>
-                  {data.user.id==='49683930-be71-418a-8bd2-2513362ea846'&&<DropdownMenuItem asChild><Link href="/admin"><ShieldCheck/>ศูนย์จัดการ CEO</Link></DropdownMenuItem>}
+                  {isAdmin&&<DropdownMenuItem asChild><Link href="/admin"><ShieldCheck/>ศูนย์จัดการ CEO</Link></DropdownMenuItem>}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild><Link href="/account?tab=bookings"><CalendarDays />การจองของฉัน</Link></DropdownMenuItem>
                   <DropdownMenuItem asChild><Link href="/host"><House />พื้นที่ของฉัน</Link></DropdownMenuItem>
