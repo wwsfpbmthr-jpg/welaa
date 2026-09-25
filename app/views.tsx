@@ -9,13 +9,13 @@ import {Tabs,TabsList,TabsTrigger,TabsContent} from '@/components/ui/tabs';
 import {useApp} from './context';
 import {SpaceCard,SectionHead,Categories,Choice,Check,Empty} from './ui';
 import {today,parseSearch,money,hour,slotStatus,instantInfo,cities,types,facilities,normalizeCategory,coordinates} from './data';
-export function SearchBox({compact=false}:{compact?:boolean}){const {go,all}=useApp(),p=useSearchParams();const [q,setQ]=useState(p.get('q')||''),[city,setCity]=useState(p.get('city')||'ทั้งหมด'),[date,setDate]=useState(p.get('date')||''),[start,setStart]=useState(p.get('start')||'any'),[guests,setGuests]=useState(p.get('guests')||'1');const cityOptions=[...cities,...new Set(all.map(s=>s.city).filter(c=>c&&!cities.includes(c)))];if(city!=='ทั้งหมด'&&!cityOptions.includes(city))cityOptions.push(city);function submit(e:any){e.preventDefault();const x=parseSearch(q),a=new URLSearchParams();if(q)a.set('q',q);a.set('city',x.city||city);if(x.cat!=='ทั้งหมด')a.set('cat',x.cat);if(x.date||date||x.start||start!=='any')a.set('date',x.date||date||today());if(x.start||start!=='any')a.set('start',String(x.start||start));if(x.duration)a.set('duration',String(x.duration));a.set('guests',String(x.guests||guests));go('/search?'+a)}return <form className={'searchbox '+(compact?'compact':'')} onSubmit={submit}><div className="query"><Search size={22}/><input aria-label="ค้นหาพื้นที่" value={q} onChange={e=>setQ(e.target.value)} placeholder="เช่น ห้องประชุม 6 คน หรือสตูดิโอถ่ายคลิป"/><span className="query-hint">ลอง “ห้องประชุม 6 คนช่วงบ่าย”</span></div><div className="search-fields"><label><span>สถานที่</span><Choice value={city} onChange={setCity} label="สถานที่" options={[{value:'ทั้งหมด',label:'ทุกพื้นที่'},...cityOptions]}/></label><label><span>วันที่</span><input aria-label="วันที่ค้นหา" type="date" min={today()} value={date} onChange={e=>setDate(e.target.value)}/></label><label><span>ช่วงเวลา</span><Choice value={start} onChange={setStart} label="เวลาเริ่ม" options={[{value:'any',label:'ทุกช่วงเวลา'},...Array.from({length:16},(_,i)=>({value:String(i+8),label:hour(i+8)}))]}/></label><label><span>จำนวนคน</span><input aria-label="จำนวนคน" type="number" min="1" max="500" value={guests} onChange={e=>setGuests(e.target.value)}/></label><button className="button"><Search size={18}/>ค้นหาพื้นที่</button></div></form>}
+export function SearchBox({compact=false,hero=false}:{compact?:boolean;hero?:boolean}){const {go,all}=useApp(),p=useSearchParams();const [q,setQ]=useState(p.get('q')||''),[city,setCity]=useState(p.get('city')||'ทั้งหมด'),[date,setDate]=useState(p.get('date')||''),[start,setStart]=useState(p.get('start')||'any'),[guests,setGuests]=useState(p.get('guests')||'1');const cityOptions=[...cities,...new Set(all.map(s=>s.city).filter(c=>c&&!cities.includes(c)))];if(city!=='ทั้งหมด'&&!cityOptions.includes(city))cityOptions.push(city);function submit(e:any){e.preventDefault();const x=parseSearch(q),a=new URLSearchParams();if(q)a.set('q',q);a.set('city',x.city||city);if(x.cat!=='ทั้งหมด')a.set('cat',x.cat);if(x.date||date||x.start||start!=='any')a.set('date',x.date||date||today());if(x.start||start!=='any')a.set('start',String(x.start||start));if(x.duration)a.set('duration',String(x.duration));a.set('guests',String(x.guests||guests));go('/search?'+a)}return <form className={'searchbox '+(compact?'compact ':'')+(hero?'hero-searchbox':'')} onSubmit={submit}><div className="query"><Search size={22}/><input aria-label="ค้นหาพื้นที่" value={q} onChange={e=>setQ(e.target.value)} placeholder="ค้นหา เช่น ห้องประชุม สตูดิโอ หรือพื้นที่จัดกิจกรรม"/><span className="query-hint">ลอง “ห้องประชุม 6 คนช่วงบ่าย”</span></div><div className="search-fields"><label><span>สถานที่</span><Choice value={city} onChange={setCity} label="สถานที่" options={[{value:'ทั้งหมด',label:'ทุกพื้นที่'},...cityOptions]}/></label><label><span>วันที่</span><input aria-label="วันที่ค้นหา" type="date" min={today()} value={date} onChange={e=>setDate(e.target.value)}/></label><label><span>ช่วงเวลา</span><Choice value={start} onChange={setStart} label="เวลาเริ่ม" options={[{value:'any',label:'ทุกช่วงเวลา'},...Array.from({length:16},(_,i)=>({value:String(i+8),label:hour(i+8)}))]}/></label><label><span>จำนวนคน</span><input aria-label="จำนวนคน" type="number" min="1" max="500" value={guests} onChange={e=>setGuests(e.target.value)}/></label><button className="button"><Search size={18}/>ค้นหาพื้นที่</button></div></form>}
 const popularCities=[
-  {name:'กรุงเทพฯ',english:'BANGKOK',Icon:Building2},
-  {name:'เชียงใหม่',english:'CHIANG MAI',Icon:Mountain},
-  {name:'ภูเก็ต',english:'PHUKET',Icon:Waves},
-  {name:'พัทยา',english:'PATTAYA',Icon:Landmark},
-  {name:'หาดใหญ่',english:'HAT YAI',Icon:MapPin},
+  {name:'กรุงเทพฯ',english:'BANGKOK',image:'https://images.unsplash.com/photo-1589018965540-3e6fc3254ff5?auto=format&fit=crop&w=1000&q=82'},
+  {name:'เชียงใหม่',english:'CHIANG MAI',image:'https://images.unsplash.com/photo-1678916022050-6063137a5d5a?auto=format&fit=crop&w=1000&q=82'},
+  {name:'ภูเก็ต',english:'PHUKET',image:'https://images.unsplash.com/photo-1717748904007-5721bcca6a13?auto=format&fit=crop&w=1000&q=82'},
+  {name:'พัทยา',english:'PATTAYA',image:'https://images.unsplash.com/photo-1643174769637-813001aa18e1?auto=format&fit=crop&w=1000&q=82'},
+  {name:'หาดใหญ่',english:'HAT YAI',image:'https://images.unsplash.com/photo-1683119109118-9c96dd9618f5?auto=format&fit=crop&w=1000&q=82'},
 ];
 export function Home(){
   const {go,all}=useApp();
@@ -25,16 +25,24 @@ export function Home(){
     <div className="container home-top-categories" id="categories">
       <Categories value={category} onChange={next=>go(next==='ทั้งหมด'?'/search':`/search?cat=${encodeURIComponent(next)}`)}/>
     </div>
-    <section className="home-search">
-      <SearchBox/>
+    <section className="home-hero" aria-labelledby="home-hero-title">
+      <img className="home-hero-image" src="/photos/meeting.jpg" alt="" fetchPriority="high"/>
+      <div className="home-hero-shade"/>
+      <div className="home-hero-content">
+        <span className="home-hero-eyebrow">SPACE TO MAKE IT HAPPEN</span>
+        <h1 id="home-hero-title">ค้นหาพื้นที่<br/>ที่ใช่สำหรับทุกไอเดีย</h1>
+        <p>เลือกพื้นที่ดี ๆ ให้พอดีกับเวลาของคุณ</p>
+      </div>
+      <div className="home-search"><SearchBox hero/></div>
     </section>
-    <section className="section">
-      <SectionHead title="เมืองยอดนิยม" sub="เลือกเมืองเพื่อเริ่มค้นหาพื้นที่ที่เหมาะกับคุณ"/>
+    <section className="section home-cities">
+      <SectionHead title="เมืองยอดนิยม" sub="เลือกเมือง แล้วเริ่มหาพื้นที่ในแบบของคุณ"/>
       <div className="city-grid">
-        {popularCities.map(({name,english,Icon})=><Link className="city-card" href={`/search?city=${encodeURIComponent(name)}`} key={name}>
-          <span className="city-card-icon"><Icon size={21} strokeWidth={1.7}/></span>
+        {popularCities.map(({name,english,image})=><Link className="city-card" href={`/search?city=${encodeURIComponent(name)}`} key={name} aria-label={`ค้นหาพื้นที่ใน${name}`}>
+          <img className="city-card-image" src={image} alt="" loading="lazy"/>
+          <span className="city-card-shade"/>
           <span className="city-card-copy"><b>{name}</b><small>{english}</small></span>
-          <ArrowUpRight className="city-card-arrow" size={17}/>
+          <ArrowUpRight className="city-card-arrow" size={18}/>
         </Link>)}
       </div>
     </section>
