@@ -71,25 +71,10 @@ function mapListing(row: any): Space {
   };
 }
 
-function NavigationStage({ destination }: { destination: string }) {
-  const label = destination === '/' ? 'สำรวจ' : destination === '/search' ? 'ค้นหา' : destination === '/host/new' ? 'ปล่อยพื้นที่' : destination === '/account' ? 'การจอง' : 'โปรไฟล์';
-  return (
-    <div className="navigation-stage" role="status" aria-live="polite" aria-label={`กำลังเปิด${label}`}>
-      <div className="navigation-stage-card">
-        <div className="navigation-stage-mark" aria-hidden="true"><span /><span /><span /></div>
-        <p>กำลังเปิด{label}</p>
-        <div className="navigation-stage-bar" aria-hidden="true"><span /></div>
-        <div className="navigation-stage-lines" aria-hidden="true"><span /><span /><span /></div>
-      </div>
-    </div>
-  );
-}
-
 export default function Welaa() {
   const path = usePathname() || '/';
   const router = useRouter();
   const [pendingPath, setPendingPath] = useState<string | null>(null);
-  const isNavigating = pendingPath !== null && pendingPath !== path;
   const navPath = pendingPath ?? path;
   const activeNavIndex = navPath === '/' ? 0 : navPath === '/search' ? 1 : navPath === '/host/new' ? 2 : navPath === '/account' ? 3 : navPath === '/profile' || navPath === '/host' || navPath === '/host/calendar' ? 4 : -1;
   const [data, setData] = useState<AppData>(initial);
@@ -99,7 +84,6 @@ export default function Welaa() {
   const authRevision = useRef(0);
   const refreshRequest = useRef(0);
   const lastRefreshAt = useRef(0);
-  const navTimeout = useRef<number | null>(null);
   const lastAuthUserId = useRef<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -307,14 +291,7 @@ export default function Welaa() {
     setEmailAuthOpen(false);
     setAuthOpen(true);
   };
-  useEffect(() => {
-    setPendingPath(null);
-    if (navTimeout.current !== null) window.clearTimeout(navTimeout.current);
-    navTimeout.current = null;
-  }, [path]);
-  useEffect(() => () => {
-    if (navTimeout.current !== null) window.clearTimeout(navTimeout.current);
-  }, []);
+  useEffect(() => { setPendingPath(null); }, [path]);
   useEffect(() => {
     const timer = window.setTimeout(() => {
       ['/search', '/account', '/profile', '/host/new'].forEach((route) => router.prefetch(route));
@@ -323,14 +300,7 @@ export default function Welaa() {
   }, [router]);
   const markNav = (destination: string) => {
     const target = destination.split('?')[0];
-    if (target === path) return;
-    setPendingPath(target);
-    if (navTimeout.current !== null) window.clearTimeout(navTimeout.current);
-    navTimeout.current = window.setTimeout(() => {
-      setPendingPath((current) => current === target ? null : current);
-      toast.error('หน้านี้ใช้เวลาโหลดนานกว่าปกติ กรุณาลองอีกครั้ง');
-      navTimeout.current = null;
-    }, 12000);
+    if (target !== path) setPendingPath(target);
   };
   const go = (destination: string) => { markNav(destination); router.push(destination); };
   const signOut = async () => {
@@ -592,7 +562,7 @@ export default function Welaa() {
           : <button className="button" onClick={() => auth()}>เข้าสู่ระบบ/สมัครสมาชิก</button>}
       </header>
       {error && <div className="data-error">{error} <button className="text-link" onClick={() => void refresh()}>ลองใหม่</button></div>}
-      <main aria-busy={isNavigating}>{isNavigating ? <NavigationStage destination={pendingPath!} /> : view}</main>
+      <main>{view}</main>
       <footer className="footer">
         <div><Logo /><p>พื้นที่มีค่า ทุกเวลา</p></div>
         <div className="footer-links">
