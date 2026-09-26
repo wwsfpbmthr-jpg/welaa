@@ -329,7 +329,7 @@ export default function Welaa() {
         return true;
       }
       if (body.action === 'favorite') {
-        if (body.saved) {
+        if (!body.saved) {
           const { error } = await supabase.from('favorites').upsert(
             { user_id: data.user.id, listing_id: body.spaceId },
             { onConflict: 'user_id,listing_id' },
@@ -346,8 +346,8 @@ export default function Welaa() {
         setData((current) => ({
           ...current,
           favorites: body.saved
-            ? current.favorites.includes(body.spaceId) ? current.favorites : [...current.favorites, body.spaceId]
-            : current.favorites.filter((favoriteId) => favoriteId !== body.spaceId),
+            ? current.favorites.filter((favoriteId) => favoriteId !== body.spaceId)
+            : current.favorites.includes(body.spaceId) ? current.favorites : [...current.favorites, body.spaceId],
         }));
         return true;
       } else if (body.action === 'publish') {
