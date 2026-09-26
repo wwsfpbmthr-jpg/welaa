@@ -84,6 +84,7 @@ export default function Welaa() {
   const authRevision = useRef(0);
   const refreshRequest = useRef(0);
   const lastRefreshAt = useRef(0);
+  const lastAuthUserId = useRef<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [authOpen, setAuthOpen] = useState(false);
@@ -234,6 +235,9 @@ export default function Welaa() {
   useEffect(() => {
     const { data: authState } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'TOKEN_REFRESHED') return;
+      const nextUserId = session?.user?.id ?? null;
+      if (event === 'SIGNED_IN' && nextUserId === lastAuthUserId.current && Date.now() - lastRefreshAt.current < 60_000) return;
+      lastAuthUserId.current = nextUserId;
       authRevision.current += 1;
       const authUser = session?.user;
       if (authUser) {
