@@ -73,14 +73,17 @@ function mapListing(row: any): Space {
 
 export default function Welaa() {
   const path = usePathname() || '/';
-  const activeNavIndex = path === '/' ? 0 : path === '/search' ? 1 : path === '/host/new' ? 2 : path === '/account' ? 3 : path === '/profile' || path === '/host' || path === '/host/calendar' ? 4 : -1;
   const router = useRouter();
+  const [pendingPath, setPendingPath] = useState<string | null>(null);
+  const navPath = pendingPath ?? path;
+  const activeNavIndex = navPath === '/' ? 0 : navPath === '/search' ? 1 : navPath === '/host/new' ? 2 : navPath === '/account' ? 3 : navPath === '/profile' || navPath === '/host' || navPath === '/host/calendar' ? 4 : -1;
   const [data, setData] = useState<AppData>(initial);
   const [ready, setReady] = useState(false);
   const [authReady, setAuthReady] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const authRevision = useRef(0);
   const refreshRequest = useRef(0);
+  const lastRefreshAt = useRef(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [authOpen, setAuthOpen] = useState(false);
@@ -106,6 +109,7 @@ export default function Welaa() {
   const refresh = useCallback(async () => {
     const requestRevision = authRevision.current;
     const requestId = ++refreshRequest.current;
+    lastRefreshAt.current = Date.now();
     try {
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       if (sessionError) throw sessionError;
@@ -229,6 +233,7 @@ export default function Welaa() {
 
   useEffect(() => {
     const { data: authState } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'TOKEN_REFRESHED') return;
       authRevision.current += 1;
       const authUser = session?.user;
       if (authUser) {
@@ -265,7 +270,9 @@ export default function Welaa() {
       if (event === 'INITIAL_SESSION' || event === 'SIGNED_OUT' || authUser) setAuthReady(true);
       window.setTimeout(() => void refresh(), 0);
     });
-    const handleFocus = () => void refresh();
+    const handleFocus = () => {
+      if (Date.now() - lastRefreshAt.current > 60_000) void refresh();
+    };
     window.addEventListener('focus', handleFocus);
     void refresh();
     return () => {
@@ -280,7 +287,18 @@ export default function Welaa() {
     setEmailAuthOpen(false);
     setAuthOpen(true);
   };
-  const go = (destination: string) => router.push(destination);
+  useEffect(() => { setPendingPath(null); }, [path]);
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      ['/search', '/account', '/profile', '/host/new'].forEach((route) => router.prefetch(route));
+    }, 900);
+    return () => window.clearTimeout(timer);
+  }, [router]);
+  const markNav = (destination: string) => {
+    const target = destination.split('?')[0];
+    if (target !== path) setPendingPath(target);
+  };
+  const go = (destination: string) => { markNav(destination); router.push(destination); };
   const signOut = async () => {
     const { error: signOutError } = await supabase.auth.signOut({ scope: 'local' });
     if (signOutError) {
@@ -321,6 +339,13 @@ export default function Welaa() {
             .eq('listing_id', body.spaceId);
           if (error) throw error;
         }
+        setData((current) => ({
+          ...current,
+          favorites: body.saved
+            ? current.favorites.includes(body.spaceId) ? current.favorites : [...current.favorites, body.spaceId]
+            : current.favorites.filter((favoriteId) => favoriteId !== body.spaceId),
+        }));
+        return true;
       } else if (body.action === 'publish') {
         const draft = body.data;
         const { data: listing, error } = await supabase
@@ -546,11 +571,11 @@ export default function Welaa() {
       </footer>
       <nav className={'bottom-nav' + (activeNavIndex < 0 ? ' no-active' : ' active-' + activeNavIndex)} aria-label="เมนูหลัก">
         <span className="bottom-nav-indicator" aria-hidden="true" />
-        <Link className={'bottom-nav-item' + (activeNavIndex === 0 ? ' active' : '')} href="/"><Compass />สำรวจ</Link>
-        <Link className={'bottom-nav-item' + (activeNavIndex === 1 ? ' active' : '')} href="/search"><Search />ค้นหา</Link>
-        <Link className={'bottom-nav-item add-nav' + (activeNavIndex === 2 ? ' active' : '')} href="/host/new"><Plus />ปล่อยพื้นที่</Link>
-        <Link className={'bottom-nav-item' + (activeNavIndex === 3 ? ' active' : '')} href="/account?tab=bookings" onClick={(event) => { if (!data.user) { event.preventDefault(); auth(); } }}><CalendarDays />การจอง</Link>
-        <Link className={'bottom-nav-item' + (activeNavIndex === 4 ? ' active' : '')} href="/profile"><UserRound />โปรไฟล์</Link>
+        <Link className={'bottom-nav-item' + (activeNavIndex === 0 ? ' active' : '')} href="/" onClick={() => markNav('/')}><Compass />สำรวจ</Link>
+        <Link className={'bottom-nav-item' + (activeNavIndex === 1 ? ' active' : '')} href="/search" onClick={() => markNav('/search')}><Search />ค้นหา</Link>
+        <Link className={'bottom-nav-item add-nav' + (activeNavIndex === 2 ? ' active' : '')} href="/host/new" onClick={() => markNav('/host/new')}><Plus />ปล่อยพื้นที่</Link>
+        <Link className={'bottom-nav-item' + (activeNavIndex === 3 ? ' active' : '')} href="/account?tab=bookings" onClick={(event) => { if (!data.user) { event.preventDefault(); auth(); } else markNav('/account'); }}><CalendarDays />การจอง</Link>
+        <Link className={'bottom-nav-item' + (activeNavIndex === 4 ? ' active' : '')} href="/profile" onClick={() => markNav('/profile')}><UserRound />โปรไฟล์</Link>
       </nav>
       <Dialog open={authOpen} onOpenChange={(open) => {
         setAuthOpen(open);
