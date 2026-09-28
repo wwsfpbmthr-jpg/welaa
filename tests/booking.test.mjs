@@ -1,0 +1,20 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {makeQuote,validateSelection,beginBooking,transition,previewAllowed} from '../lib/booking.ts';
+const now=Date.parse('2026-09-27T00:00:00Z');
+const listing={id:'196e9438-76df-42cf-9b62-2c881c3f1b25',title:'Test fixture only',status:'published',hourly_price:280,guest_limit:12,open_hour:8,close_hour:20};
+const selection={listingId:listing.id,date:'2026-09-28',start:9,end:11,guests:6,hypothetical:false};
+const slots=[{hour:9,hourly_price:280,is_open:true},{hour:10,hourly_price:350,is_open:true}];
+test('server price uses each hour, integer satang and 8% fee',()=>{const q=makeQuote(selection,listing,slots,now);assert.equal(q.subtotal,63000);assert.equal(q.fee,5040);assert.equal(q.total,68040)});
+test('hypothetical times explicitly use real listing base rate',()=>{const q=makeQuote({...selection,hypothetical:true},listing,[],now);assert.equal(q.total,60480);assert.equal(q.inventory,'hypothetical')});
+test('closed or missing slots are not fabricated',()=>{assert.throws(()=>makeQuote(selection,listing,[],now));assert.throws(()=>makeQuote(selection,listing,[slots[0],{...slots[1],is_open:false}],now))});
+test('reject past, impossible date, backwards time, fractional guests, overcapacity, unlisted, wrong listing, invalid prices',()=>{
+  for(const patch of [{date:'2026-09-01'},{date:'2026-02-31'},{date:'2026-99-99'},{date:'2029-09-28'},{start:11,end:9},{guests:1.5},{guests:13},{start:7},{end:21},{listingId:'bad'}])assert.throws(()=>makeQuote({...selection,...patch},listing,slots,now));
+  for(const patch of [{status:'draft'},{id:'other'},{hourly_price:0},{hourly_price:NaN}])assert.throws(()=>makeQuote({...selection,hypothetical:true},{...listing,...patch},[],now));
+});
+test('quotes strip client supplied prices and totals',()=>{const parsed=validateSelection({...selection,total:1,fee:0},now);assert.equal('total' in parsed,false);assert.equal(makeQuote(parsed,listing,slots,now).total,68040)});
+test('payment success is idempotent and awaits host, not instant confirmation',()=>{const b=beginBooking(makeQuote(selection,listing,slots,now),'TEST',now);const paid=transition(b,'payment_success',now);assert.equal(paid.booking,'awaiting_host');assert.equal(paid.payment,'paid');assert.equal(transition(paid,'payment_success',now),paid);assert.equal(transition(paid,'host_accept',now).booking,'confirmed')});
+test('failure can retry, cancel prevents later payment or confirmation',()=>{const b=beginBooking(makeQuote(selection,listing,slots,now),'TEST',now);const failed=transition(b,'payment_failure',now);assert.equal(failed.payment,'failed');assert.equal(transition(failed,'payment_success',now).payment,'paid');const cancelled=transition(failed,'cancel',now);assert.equal(transition(cancelled,'payment_success',now),cancelled);assert.equal(transition(cancelled,'host_accept',now),cancelled)});
+test('paid cancellation starts refund, duplicate refund is harmless',()=>{let b=beginBooking(makeQuote(selection,listing,slots,now),'TEST',now);b=transition(b,'payment_success',now);b=transition(b,'cancel',now);assert.equal(b.payment,'refund_pending');b=transition(b,'refund_complete',now);assert.equal(b.payment,'refunded');assert.equal(transition(b,'refund_complete',now),b)});
+test('unpaid cannot be confirmed/refunded; expired quote cannot be paid',()=>{const q=makeQuote(selection,listing,slots,now);const b=beginBooking(q,'TEST',now);assert.equal(transition(b,'host_accept',now),b);assert.equal(transition(b,'refund_complete',now),b);assert.throws(()=>beginBooking(q,'TEST',q.expiresAt));assert.throws(()=>transition(b,'payment_success',q.expiresAt))});
+test('simulation endpoint fails closed on production/unknown deployments',()=>{assert.equal(previewAllowed({VERCEL_ENV:'production',NODE_ENV:'development'}),false);assert.equal(previewAllowed({NODE_ENV:'production'}),false);assert.equal(previewAllowed({}),false);assert.equal(previewAllowed({VERCEL_ENV:'preview',NODE_ENV:'production'}),true);assert.equal(previewAllowed({NODE_ENV:'development'}),true)});

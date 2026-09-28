@@ -2,8 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+const Checkout = dynamic(() => import('./checkout'));
 import { usePathname, useRouter } from 'next/navigation';
-import { Plus, Search, Compass, CalendarDays, UserRound, ArrowUpRight, ShieldCheck, Menu, House, Heart, CircleHelp, LogOut, Mail, ChevronDown } from 'lucide-react';
+import { FlaskConical, Plus, Search, Compass, CalendarDays, UserRound, ArrowUpRight, ShieldCheck, Menu, House, Heart, CircleHelp, LogOut, Mail, ChevronDown } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Toaster, toast } from 'sonner';
@@ -71,7 +73,7 @@ function mapListing(row: any): Space {
   };
 }
 
-export default function Welaa() {
+export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
   const path = usePathname() || '/';
   const router = useRouter();
   const [pendingPath, setPendingPath] = useState<string | null>(null);
@@ -255,7 +257,7 @@ export default function Welaa() {
               bio: sameUser ? current.user!.bio : '',
             },
             ...(current.user && !sameUser
-              ? { spaces: current.spaces.filter((space) => !space.owner), bookings: [], favorites: [], messages: [], reviews: [] }
+              ? { spaces: current.spaces.filter((space) => space.status === 'published'), bookings: [], favorites: [], messages: [], reviews: [] }
               : {}),
           };
         });
@@ -506,6 +508,7 @@ export default function Welaa() {
   let view;
   if (path === '/') view = <Home />;
   else if (path === '/search') view = <SearchPage />;
+  else if (path === '/checkout' && previewMode) view = <Checkout />;
   else if (path.startsWith('/spaces/')) view = <Detail id={path.split('/')[2]} />;
   else if (path === '/host/new') view = <Wizard />;
   else if (path === '/host/calendar') view = <HostCalendar />;
@@ -516,7 +519,7 @@ export default function Welaa() {
   else view = <div className="page empty"><h1>ไม่พบหน้านี้</h1><Link className="button" href="/">กลับหน้าหลัก</Link></div>;
 
   return (
-    <AppContext.Provider value={{ data, all: data.spaces, ready, authReady, busy, act, refresh, auth, go, favorite, signOut }}>
+    <AppContext.Provider value={{ data, all: data.spaces, previewMode, ready, authReady, busy, act, refresh, auth, go, favorite, signOut }}>
       <header className="navbar">
         <Logo />
         <nav><Link href="/search">ค้นหาพื้นที่</Link><Link href="/#categories">หมวดหมู่</Link><Link href="/how-it-works">วิธีใช้งาน</Link></nav>
@@ -562,6 +565,7 @@ export default function Welaa() {
           : <button className="button" onClick={() => auth()}>เข้าสู่ระบบ/สมัครสมาชิก</button>}
       </header>
       {error && <div className="data-error">{error} <button className="text-link" onClick={() => void refresh()}>ลองใหม่</button></div>}
+      {previewMode && <div className="preview-workspace-bar"><FlaskConical size={14}/><span>พรีวิวเส้นทางการจอง · ไม่รับเงินจริง</span><Link href="/checkout?history=1">รายการทดสอบ</Link></div>}
       <main>{view}</main>
       <footer className="footer">
         <div><Logo /><p>พื้นที่มีค่า ทุกเวลา</p></div>
