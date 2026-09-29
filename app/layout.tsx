@@ -2,6 +2,7 @@ import type {Metadata} from 'next';
 import './welaa-styles.css';
 import './typography.css';
 import './booking-experience.css';
+import './ui-refinements.css';
 import {previewAllowed} from '@/lib/booking';
 import Welaa from './welaa';
 import {LanguageProvider} from './language';

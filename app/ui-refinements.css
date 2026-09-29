@@ -1,0 +1,51 @@
+/* Scoped discovery refinements: existing auth, host, and booking behavior stays intact. */
+.home-top-categories .categories{padding-block:18px 12px}
+.home-top-categories .category,.search-page .category{transition:color .15s,background .15s;min-width:64px}
+.home-top-categories .category:hover,.search-page .category:hover{color:#172d3e;background:#f6f8fa;border-radius:10px 10px 0 0}
+.home-hero{box-shadow:0 14px 40px #172d3e12}
+.home-search .searchbox.hero-searchbox{box-shadow:0 8px 24px #0b23351a}
+.searchbox:focus-within{outline:2px solid #9baebd;outline-offset:3px}
+.city-section-heading{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.city-section-heading .section-head{flex:1}
+.city-controls{display:flex;gap:8px;align-self:flex-start;padding-top:5px}
+.city-controls button{display:grid;place-items:center;width:40px;height:40px;border:1px solid #dde4e9;border-radius:50%;background:#fff;transition:background .15s}
+.city-controls button:hover{background:#edf2f5}
+.home-cities .city-card{scroll-snap-align:start}
+.space-card{border:1px solid #e5eaee;border-radius:18px;overflow:hidden;background:#fff;transition:border-color .16s,box-shadow .16s}
+.space-card:hover,.space-card:focus-within{border-color:#b9c8d2;box-shadow:0 8px 24px #172d3e0a}
+.space-card .card-photo{border-radius:0;aspect-ratio:1.5}
+.space-card>.card-photo+ a{display:block;padding:0 16px 16px}
+.space-card .card-title{align-items:flex-start;margin-top:14px}
+.space-card .card-title h3{overflow-wrap:anywhere;font-size:16px;line-height:1.55}
+.space-card .card-title>span{background:#f1f5f7;padding:3px 7px;border-radius:6px;font-size:11px}
+.space-card .location,.space-card .card-capacity{display:flex;align-items:center;gap:5px;font-size:12px;color:#637684;line-height:1.7;margin-top:6px}
+.space-card .card-bottom{border-top:1px solid #edf0f2;padding-top:12px;margin-top:12px;flex-wrap:wrap;row-gap:6px}
+.space-card .favorite{width:40px;height:40px;box-shadow:0 2px 8px #172d3e12}
+.search-page .results-toolbar{padding:18px 0;gap:16px;align-items:center;flex-wrap:wrap}
+.search-page .results-toolbar>.row{flex-wrap:wrap;gap:8px}
+.search-page .results-toolbar .button{min-height:42px}
+.search-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.search-chips>button{display:inline-flex;align-items:center;gap:9px;padding:8px 12px;min-height:38px;border-radius:20px;background:#edf2f5;color:#304b5d;font-size:12px;max-width:100%;overflow-wrap:anywhere;text-align:left}
+.search-chips>button:hover{background:#dfe8ef}
+.search-chips>.clear-search{background:transparent;text-decoration:underline;text-underline-offset:3px}
+.filter-count{display:grid;place-items:center;background:#172d3e;color:#fff;border-radius:50%;min-width:20px;height:20px;font-size:11px}
+.search-page .empty{border:1px dashed #cdd8df;border-radius:18px;background:#f8fafb;padding:40px 24px}
+.search-page .empty p{max-width:42ch;margin:8px auto 20px;color:#637684}
+@media(min-width:1001px){.search-page .space-grid{gap:24px}.home-cities .city-card{height:190px}}
+@media(max-width:640px){
+ .home-top-categories .categories{gap:12px;padding-block:12px 8px}
+ .home-top-categories .category{font-size:11px;min-width:55px;padding-inline:3px}
+ .city-controls{gap:5px}.city-controls button{width:34px;height:34px}
+ .city-section-heading .section-head{margin-bottom:16px}
+ .city-section-heading .section-head p{max-width:26ch;font-size:12px}
+ .space-card{border-radius:14px}.space-card>.card-photo+ a{padding:0 11px 12px}
+ .space-card .card-title{gap:5px}.space-card .card-title h3{font-size:14px}
+ .space-card .card-title>span{font-size:10px;padding:2px 5px}
+ .space-card .location,.space-card .card-capacity{font-size:11px}
+ .space-card .card-bottom b{font-size:16px}.space-card .card-bottom small{font-size:10px}
+ .search-page .results-toolbar>.row{width:100%;justify-content:space-between}
+ .search-page .results-toolbar .button{padding:10px 12px;font-size:12px}
+ .search-page .results-toolbar [data-slot=select-trigger]{min-width:0;max-width:160px;font-size:12px}
+ .search-chips{gap:6px}.search-chips>button{font-size:11px;padding:7px 10px}
+}
+@media(prefers-reduced-motion:reduce){.space-card,.city-controls button,.home-top-categories .category,.search-page .category{transition:none}}
