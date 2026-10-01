@@ -69,7 +69,7 @@ export function Home(){
   const recentSpaces=all.filter(space=>space.status==='published').slice(0,4);
   return <div className="discovery-home">
     <section className="discovery-intro container" aria-labelledby="discovery-title">
-      <div className="discovery-heading"><div><h1 id="discovery-title">พื้นที่ที่ใช่ สำหรับทุกไอเดีย</h1><p>ประชุม ถ่ายคอนเทนต์ หรือทำสิ่งใหม่ ๆ ในพื้นที่ของคุณ</p></div><Link className="discovery-how" href="/how-it-works">WELAA ทำงานอย่างไร <ArrowUpRight size={16}/></Link></div>
+      <h1 id="discovery-title" className="search-screen-title">ค้นหาพื้นที่ WELAA</h1>
       <SearchBox hero/>
       <div id="categories"><Categories value="ทั้งหมด" onChange={next=>go(next==='ทั้งหมด'?'/search':`/search?cat=${encodeURIComponent(next)}`)}/></div>
     </section>

@@ -8,7 +8,7 @@ import {Checkbox} from '@/components/ui/checkbox';
 import {categories,Space,money,hour,instantInfo} from './data';
 import {useApp} from './context';
 const icons=[LayoutGrid,Users,Video,GraduationCap,PartyPopper];
-export function Logo(){return <Link className="brand" href="/"><span className="brand-mark"><img src="/welaa-user-logo.svg" alt=""/></span>WELAA<span className="brand-dot">.</span></Link>}
+export function Logo(){return <Link className="brand" href="/" aria-label="WELAA หน้าหลัก"><span className="brand-mark"><img src="/welaa-user-logo.svg" alt=""/></span></Link>}
 export function Choice({value,onChange,options,label}:{value:string;onChange:(v:string)=>void;options:(string|{value:string;label:string})[];label:string}){return <Select value={value} onValueChange={onChange}><SelectTrigger aria-label={label}><SelectValue placeholder={label}/></SelectTrigger><SelectContent>{options.map(o=><SelectItem key={typeof o==='string'?o:o.value} value={typeof o==='string'?o:o.value}>{typeof o==='string'?o:o.label}</SelectItem>)}</SelectContent></Select>}
 export function Check({checked,onChange,children}:{checked:boolean;onChange:(v:boolean)=>void;children:ReactNode}){return <label className="check-row"><Checkbox checked={checked} onCheckedChange={v=>onChange(v===true)}/><span>{children}</span></label>}
 export function Categories({value,onChange}:{value:string;onChange:(c:string)=>void}){return <div className="categories">{['ทั้งหมด',...categories].map((c,i)=>{const Icon=icons[i];return <button type="button" key={c} aria-pressed={c===value} onClick={()=>onChange(c)} className={'category '+(c===value?'active':'')}><Icon aria-hidden="true"/><span>{c}</span></button>})}</div>}

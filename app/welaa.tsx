@@ -568,7 +568,7 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
           : <button className="button" onClick={() => auth()} aria-label="เข้าสู่ระบบหรือสมัครสมาชิก">เข้าสู่ระบบ</button>}
       </header>
       {error && <div className="data-error">{error} <button className="text-link" onClick={() => void refresh()}>ลองใหม่</button></div>}
-      {previewMode && <div className="preview-workspace-bar"><FlaskConical size={14}/><span>พรีวิว WELAA · ไม่รับเงินจริง</span><Link href="/checkout?history=1">รายการทดสอบ</Link></div>}
+
       <main>{view}</main>
       <footer className="footer">
         <div><Logo /><p>พื้นที่มีค่า ทุกเวลา</p></div>
@@ -578,6 +578,7 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
           <Link href="/account?tab=bookings">การจอง</Link>
           <span>© {new Date().getFullYear()} WELAA</span>
         </div>
+      {previewMode && <div className="preview-workspace-bar"><FlaskConical size={14}/><span>พรีวิว WELAA · ไม่รับเงินจริง</span><Link href="/checkout?history=1">รายการทดสอบ</Link></div>}
         <small className="prototype-note">ส่งคำขอจองให้เจ้าของยืนยัน · ยังไม่มีการเรียกเก็บเงินจริง</small>
       </footer>
       <nav className={'bottom-nav' + (activeNavIndex < 0 ? ' no-active' : ' active-' + activeNavIndex)} aria-label="เมนูหลัก">

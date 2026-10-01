@@ -15,3 +15,9 @@
 .search-page .results-toolbar>.row{width:auto;flex-wrap:nowrap;margin-left:auto}
 .search-controls [data-slot=select-trigger]{min-width:0;flex:1;max-width:190px;font-size:12px;min-height:40px;border-radius:10px}
 @media(max-width:640px){.search-controls [data-slot=select-trigger]{max-width:none;font-size:11px;padding:8px;gap:4px}}
+
+.brand .brand-mark,.marketplace-navbar .brand-mark{display:block;position:relative;width:64px;height:48px;border-radius:0;background:transparent;overflow:hidden;flex:none}
+.brand .brand-mark img{position:absolute;display:block;width:123px;height:123px;max-width:none;left:-29px;top:-40px;object-fit:contain;transform:none}
+.discovery-intro{padding-top:14px!important}
+.footer .preview-workspace-bar{flex-basis:100%;width:100%;border:0;padding:4px 0;background:transparent;justify-content:flex-start}
+@media(max-width:640px){.discovery-intro{padding-top:12px!important}.marketplace-navbar .brand-mark{width:64px;height:48px}}
