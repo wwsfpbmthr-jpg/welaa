@@ -9,6 +9,10 @@ const STORAGE_KEY = 'welaa-language';
 // A lightweight translation layer for the existing UI. Keeping the source UI in
 // Thai lets us add English without rewriting booking/auth flows or stored data.
 const en: Record<string, string> = {
+  "แก้ไขการค้นหา": "Edit search",
+  "ค้นหาทุกเมือง": "Explore all cities",
+  "เลือกเมือง วัน และจำนวนคนที่เหมาะกับคุณ": "Choose your city, dates, and guests",
+  "ช่วงราคา": "Budget",
   "พื้นที่ที่ใช่ สำหรับทุกไอเดีย": "The right space for every idea",
   "ประชุม ถ่ายคอนเทนต์ หรือทำสิ่งใหม่ ๆ ในพื้นที่ของคุณ": "Meet, create, or try something new in a space of your own",
   "WELAA ทำงานอย่างไร": "How WELAA works",
