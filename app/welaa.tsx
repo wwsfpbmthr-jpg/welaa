@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 const Checkout = dynamic(() => import('./checkout'));
+const DesignPreview = dynamic(() => import('./design-preview'));
 import { usePathname, useRouter } from 'next/navigation';
 import { FlaskConical, Plus, Search, Compass, CalendarDays, UserRound, ArrowUpRight, ShieldCheck, Menu, House, Heart, CircleHelp, LogOut, Mail, ChevronDown } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -505,6 +506,8 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
     }
   };
 
+  if (path === '/design-preview' && previewMode) return <DesignPreview/>;
+
   let view;
   if (path === '/') view = <Home />;
   else if (path === '/search') view = <SearchPage />;
@@ -520,9 +523,9 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
 
   return (
     <AppContext.Provider value={{ data, all: data.spaces, previewMode, ready, authReady, busy, act, refresh, auth, go, favorite, signOut }}>
-      <header className="navbar">
+      <header className="navbar marketplace-navbar">
         <Logo />
-        <nav><Link href="/search">ค้นหาพื้นที่</Link><Link href="/#categories">หมวดหมู่</Link><Link href="/how-it-works">วิธีใช้งาน</Link></nav>
+        <nav aria-label="เมนูหลักบนคอมพิวเตอร์"><Link aria-current={path==='/search'?'page':undefined} href="/search">ค้นหาพื้นที่</Link><Link href="/host/new">ปล่อยพื้นที่</Link><Link aria-current={path==='/how-it-works'?'page':undefined} href="/how-it-works">วิธีใช้งาน</Link></nav>
         {!authReady
           ? <span aria-hidden="true" style={{ display: 'inline-block', width: 46, height: 46, flexShrink: 0 }} />
           : data.user
@@ -562,10 +565,10 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
                 </DropdownMenuContent>
               </DropdownMenu>
             </>
-          : <button className="button" onClick={() => auth()}>เข้าสู่ระบบ/สมัครสมาชิก</button>}
+          : <button className="button" onClick={() => auth()} aria-label="เข้าสู่ระบบหรือสมัครสมาชิก">เข้าสู่ระบบ</button>}
       </header>
       {error && <div className="data-error">{error} <button className="text-link" onClick={() => void refresh()}>ลองใหม่</button></div>}
-      {previewMode && <div className="preview-workspace-bar"><FlaskConical size={14}/><span>พรีวิวเส้นทางการจอง · ไม่รับเงินจริง</span><Link href="/checkout?history=1">รายการทดสอบ</Link></div>}
+      {previewMode && <div className="preview-workspace-bar"><FlaskConical size={14}/><span>พรีวิว WELAA · ไม่รับเงินจริง</span><Link href="/checkout?history=1">รายการทดสอบ</Link></div>}
       <main>{view}</main>
       <footer className="footer">
         <div><Logo /><p>พื้นที่มีค่า ทุกเวลา</p></div>

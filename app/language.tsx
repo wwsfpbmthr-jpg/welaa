@@ -9,6 +9,35 @@ const STORAGE_KEY = 'welaa-language';
 // A lightweight translation layer for the existing UI. Keeping the source UI in
 // Thai lets us add English without rewriting booking/auth flows or stored data.
 const en: Record<string, string> = {
+  "พื้นที่ที่ใช่ สำหรับทุกไอเดีย": "The right space for every idea",
+  "ประชุม ถ่ายคอนเทนต์ หรือทำสิ่งใหม่ ๆ ในพื้นที่ของคุณ": "Meet, create, or try something new in a space of your own",
+  "WELAA ทำงานอย่างไร": "How WELAA works",
+  "ห้องประชุม สตูดิโอ หรือพื้นที่จัดกิจกรรม": "Meeting rooms, studios, or event spaces",
+  "ทุกเมือง": "All cities",
+  "เวลาและจำนวนคน": "Time and guests",
+  "เลือกดูพื้นที่ก่อนได้ ยังไม่ต้องระบุวัน": "Explore first. Dates are optional.",
+  "ค้นพบพื้นที่ของคุณ": "Find your kind of space",
+  "พื้นที่จากเจ้าของจริง เลือกดูรายละเอียดก่อนจอง": "Explore spaces listed by their owners before booking",
+  "พื้นที่ใหม่กำลังมา": "New spaces are on their way",
+  "ระหว่างนี้ เลือกเมืองที่คุณสนใจเพื่อเริ่มค้นหา": "Choose a city to start exploring",
+  "เริ่มจากเมืองที่คุณชอบ": "Start with a city you love",
+  "เลือกจุดหมาย แล้วค้นหาพื้นที่ที่เหมาะกับคุณ": "Choose a destination and find your space",
+  "พื้นที่ตามเวลาของคุณ": "A space on your schedule",
+  "เลือกวัน เวลา และจำนวนคนที่เหมาะกับกิจกรรม": "Choose dates, times, and guests for your activity",
+  "รายละเอียดชัดเจน": "Clear details",
+  "ดูราคา สิ่งอำนวยความสะดวก และกฎก่อนจอง": "See pricing, amenities, and rules before booking",
+  "คุยกับเจ้าของได้": "Talk to the host",
+  "สอบถามรายละเอียด แล้วค่อยตัดสินใจ": "Ask questions before you decide",
+  "สำหรับเจ้าของพื้นที่": "FOR SPACE OWNERS",
+  "เปลี่ยนพื้นที่ว่าง": "Turn unused space",
+  "เป็นโอกาสใหม่": "into a new opportunity",
+  "ลงพื้นที่ของคุณ เลือกเวลาและราคาได้เอง": "List your space. Set your own hours and pricing.",
+  "ค้นหาพื้นที่ของคุณ": "Find your space",
+  "เลือกพื้นที่ที่เหมาะกับสิ่งที่คุณอยากทำ": "Find a space for what you want to do",
+  "เกี่ยวกับพื้นที่นี้": "About this space",
+  "พรีวิว WELAA · ไม่รับเงินจริง": "WELAA preview · No real payments",
+  "เข้าสู่ระบบหรือสมัครสมาชิก": "Log in or sign up",
+
   'เมนูหลัก': 'Main menu',
   'เปิดเมนูบัญชี': 'Open account menu',
   'เมนูบัญชี': 'Account menu',
@@ -300,7 +329,6 @@ const en: Record<string, string> = {
   'ระบุสูบบุหรี่ อาหาร สัตว์เลี้ยง เสียงดัง และกิจกรรมที่ห้าม ใช้ • แยกแต่ละข้อ': 'List rules for smoking, food, pets, noise, and restricted activities. Separate each item with •',
   'รายชั่วโมง': 'Hourly', 'รีวิวจะแสดงหลังจบการใช้งาน': 'Reviews appear after the booking is complete', 'วันแรกที่เปิดให้ใช้งาน': 'First available date',
   'ว่าง': 'Available', 'สมัครสมาชิก / เข้าสู่ระบบ': 'Sign up / Log in', 'สำรวจพื้นที่': 'Explore spaces',
-  'สำหรับเจ้าของพื้นที่': 'For hosts', 'สิ้นสุด': 'End time', 'ส่งรีวิว': 'Submit review', 'ส่งอีเมลถึงฝ่ายช่วยเหลือ': 'Email support',
   'เปลี่ยนช่วงที่ว่าง': 'Change available hours', 'เปิดพื้นที่ตอนนี้': 'Make space available now',
   'เปิดช่วงว่างวันนี้พร้อมราคาพิเศษ รายการออกจาก “ว่างตอนนี้” เองเมื่อหมดเวลา': 'Open a discounted time slot for today. It will leave “Available now” when it expires.',
   'เปิดเฉพาะวันที่เลือก คุณเพิ่มวัน เปิด–ปิดชั่วโมง และตั้งราคาพิเศษได้หลังเผยแพร่': 'Only the selected date will open. After publishing, you can add dates, set hours, and adjust prices.',
@@ -311,7 +339,6 @@ const en: Record<string, string> = {
   'เลือกหลายช่วงเวลา แล้วเปิด ปิด หรือปรับราคาในครั้งเดียว': 'Select multiple time slots to open, close, or update prices at once',
   'เวลาของคุณ': 'Your time', 'เวลาสิ้นสุด': 'End time', 'เวลาเริ่ม': 'Start time', 'แชร์': 'Share',
   'ให้พื้นที่นี้ เป็นพื้นที่ของไอเดียคุณ': 'Make this space the home of your next idea', 'ให้เป็นโอกาสดี ๆ': 'Turn it into a great opportunity', 'ไม่เปิดให้จอง': 'Not available for booking',
-
 };
 
 const LanguageContext = createContext<{ locale: Locale; setLocale: (locale: Locale) => void }>({ locale: 'th', setLocale: () => {} });
