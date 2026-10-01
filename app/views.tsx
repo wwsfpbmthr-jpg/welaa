@@ -45,7 +45,7 @@ export function SearchBox({compact=false,hero=false}:{compact?:boolean;hero?:boo
     </div>
     <div className="discovery-search-extra">
       <button type="button" className="search-more" aria-expanded={advanced} aria-controls={compact?'search-options-results':'search-options-home'} onClick={()=>setAdvanced(v=>!v)}><SlidersHorizontal size={14}/>{advanced?'ซ่อนตัวเลือกเพิ่มเติม':'เวลาและจำนวนคน'}<ChevronDown size={14} className={advanced?'rotated':''}/></button>
-      <span>เลือกดูพื้นที่ก่อนได้ ยังไม่ต้องระบุวัน</span>
+      <span>เลือกวันภายหลังได้</span>
     </div>
     {advanced&&<div className="discovery-options" id={compact?'search-options-results':'search-options-home'}>
       <label className="discovery-field"><span>ช่วงเวลา</span><Choice value={start} onChange={setStart} label="เวลาเริ่ม" options={[{value:'any',label:'ทุกช่วงเวลา'},...Array.from({length:16},(_,i)=>({value:String(i+8),label:hour(i+8)}))]}/></label>
@@ -72,7 +72,7 @@ export function Home(){
       <SearchBox hero/>
       <div id="categories"><Categories value="ทั้งหมด" onChange={next=>go(next==='ทั้งหมด'?'/search':`/search?cat=${encodeURIComponent(next)}`)}/></div>
     </section>
-    <section className="section discovery-spaces"><SectionHead title="ค้นพบพื้นที่ของคุณ" sub="พื้นที่จากเจ้าของจริง เลือกดูรายละเอียดก่อนจอง" href="/search"/>{!ready?<SpaceSkeletons/>:recentSpaces.length>0?<div className="space-grid">{recentSpaces.map(space=><SpaceCard key={space.id} s={space}/>)}</div>:<Empty title="พื้นที่ใหม่กำลังมา" sub="ระหว่างนี้ เลือกเมืองที่คุณสนใจเพื่อเริ่มค้นหา"><Link href="/search" className="button secondary">ค้นหาพื้นที่</Link></Empty>}</section>
+    <section className="section discovery-spaces"><SectionHead title="ค้นพบพื้นที่ของคุณ" sub="ดูรายละเอียด ราคา และเวลาที่เปิด" href="/search"/>{!ready?<SpaceSkeletons/>:recentSpaces.length>0?<div className="space-grid">{recentSpaces.map(space=><SpaceCard key={space.id} s={space}/>)}</div>:<Empty title="พื้นที่ใหม่กำลังมา" sub="ระหว่างนี้ เลือกเมืองที่คุณสนใจเพื่อเริ่มค้นหา"><Link href="/search" className="button secondary">ค้นหาพื้นที่</Link></Empty>}</section>
     <section className="section home-cities discovery-cities">
       <div className="city-section-heading"><SectionHead title="เริ่มจากเมืองที่คุณชอบ" sub="เลือกจุดหมาย แล้วค้นหาพื้นที่ที่เหมาะกับคุณ"/><div className="city-controls"><button type="button" aria-label="เลื่อนเมืองไปทางซ้าย" onClick={()=>scrollCities(-1)}><ChevronLeft size={18}/></button><button type="button" aria-label="เลื่อนเมืองไปทางขวา" onClick={()=>scrollCities(1)}><ChevronRight size={18}/></button></div></div>
       <div className="city-grid" ref={cityRail} role="region" aria-label="เมืองยอดนิยม เลื่อนเพื่อดูเมืองเพิ่มเติม" tabIndex={0}>
