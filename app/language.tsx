@@ -399,12 +399,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const setLocale = useCallback((next: Locale) => {
     setLocaleState(next);
-    window.localStorage.setItem(STORAGE_KEY, next);
+    try { window.localStorage.setItem(STORAGE_KEY, next); } catch { /* Use the selected language for this session. */ }
   }, []);
 
   useEffect(() => {
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (stored === 'en' || stored === 'th') setLocaleState(stored);
+    try {
+      const stored = window.localStorage.getItem(STORAGE_KEY);
+      if (stored === 'en' || stored === 'th') setLocaleState(stored);
+    } catch { /* Device storage can be unavailable in private browsing. */ }
     setHydrated(true);
   }, []);
 
@@ -413,13 +415,16 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     document.documentElement.lang = locale;
     const translate = () => applyTranslations(document.body, locale, originals.current, lastApplied.current, attrOriginals.current);
     translate();
+    let frame: number | null = null;
     const observer = new MutationObserver((records) => {
       // Translation writes are observed too. Applying the same locale is safe:
       // original text is retained per node, so the observer settles immediately.
-      if (records.some((record) => record.type === 'childList' || record.type === 'characterData' || record.type === 'attributes')) translate();
+      if (frame === null && records.some((record) => record.type === 'childList' || record.type === 'characterData' || record.type === 'attributes')) {
+        frame = window.requestAnimationFrame(() => { frame = null; translate(); });
+      }
     });
     observer.observe(document.body, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['aria-label', 'title', 'placeholder', 'alt'] });
-    return () => observer.disconnect();
+    return () => { observer.disconnect(); if (frame !== null) window.cancelAnimationFrame(frame); };
   }, [locale, hydrated]);
 
   const value = useMemo(() => ({ locale, setLocale }), [locale, setLocale]);

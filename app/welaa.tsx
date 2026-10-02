@@ -126,44 +126,41 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
       if (requestRevision !== authRevision.current || requestId !== refreshRequest.current) return;
       setAuthReady(true);
 
-      let profile: any = null;
-      if (user) {
-        const result = await supabase.from('profiles').select('*').eq('id', user.id).maybeSingle();
-        if (result.error) throw result.error;
-        profile = result.data;
-      }
-
+      // Independent queries run together; availability depends only on listing IDs.
       let listingQuery = supabase.from('listings').select('*').order('created_at', { ascending: false });
       if (user) listingQuery = listingQuery.or(`status.eq.published,owner_id.eq.${user.id}`);
       else listingQuery = listingQuery.eq('status', 'published');
-      const listingResult = await listingQuery;
-      if (listingResult.error) throw listingResult.error;
-      const listingRows = listingResult.data ?? [];
-      const ids = listingRows.map((row) => row.id);
-
-      let availabilityRows: any[] = [];
-      if (ids.length) {
-        const result = await supabase
-          .from('availability')
-          .select('listing_id,available_date,hour,hourly_price,is_open')
-          .in('listing_id', ids)
-          .gte('available_date', today())
-          .lte('available_date', datePlus(180));
-        if (result.error) throw result.error;
-        availabilityRows = result.data ?? [];
-      }
-
-      let bookingRows: any[] = [];
-      let favoriteRows: any[] = [];
-      if (user) {
-        const [bookingsResult, favoritesResult] = await Promise.all([
-          supabase.from('bookings').select('*').order('created_at', { ascending: false }),
-          supabase.from('favorites').select('listing_id'),
-        ]);
-        if (bookingsResult.error) throw bookingsResult.error;
-        if (favoritesResult.error) throw favoritesResult.error;
-        bookingRows = bookingsResult.data ?? [];
-        favoriteRows = favoritesResult.data ?? [];
+      const [profileResult, listingsData, bookingsResult, favoritesResult] = await Promise.all([
+        user ? supabase.from('profiles').select('*').eq('id', user.id).maybeSingle() : Promise.resolve({ data: null, error: null }),
+        (async () => {
+          const result = await listingQuery;
+          if (result.error) throw result.error;
+          const rows = result.data ?? [];
+          const ids = rows.map(row => row.id);
+          if (!ids.length) return { rows, availability: [] };
+          const slots = await supabase.from('availability')
+            .select('listing_id,available_date,hour,hourly_price,is_open')
+            .in('listing_id', ids).gte('available_date', today()).lte('available_date', datePlus(180));
+          if (slots.error) throw slots.error;
+          return { rows, availability: slots.data ?? [] };
+        })(),
+        user ? supabase.from('bookings').select('*').order('created_at', { ascending: false }) : Promise.resolve({ data: [], error: null }),
+        user ? supabase.from('favorites').select('listing_id') : Promise.resolve({ data: [], error: null }),
+      ]);
+      if (profileResult.error) throw profileResult.error;
+      if (bookingsResult.error) throw bookingsResult.error;
+      if (favoritesResult.error) throw favoritesResult.error;
+      const profile = profileResult.data;
+      const listingRows = listingsData.rows;
+      const availabilityRows = listingsData.availability;
+      const bookingRows = bookingsResult.data ?? [];
+      const favoriteRows = favoritesResult.data ?? [];
+      let draft = null;
+      try {
+        const stored = JSON.parse(window.localStorage.getItem('welaa-draft') || 'null');
+        if (stored && typeof stored === 'object' && !Array.isArray(stored)) draft = stored;
+      } catch {
+        // Corrupt or unavailable device storage must not stop remote data loading.
       }
 
       const mappedBookings = bookingRows.map((row) => ({
@@ -215,7 +212,7 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
         favorites: favoriteRows.map((row) => row.listing_id),
         messages: [],
         reviews: [],
-        draft: typeof window === 'undefined' ? null : JSON.parse(window.localStorage.getItem('welaa-draft') || 'null'),
+        draft,
       };
       if (requestRevision !== authRevision.current || requestId !== refreshRequest.current) return;
       setData(nextData);
@@ -234,7 +231,7 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
         setReady(true);
       }
     } finally {
-      setAuthReady(true);
+      if (requestRevision === authRevision.current && requestId === refreshRequest.current) setAuthReady(true);
     }
   }, []);
 
@@ -284,7 +281,7 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
       if (Date.now() - lastRefreshAt.current > 60_000) void refresh();
     };
     window.addEventListener('focus', handleFocus);
-    void refresh();
+    // INITIAL_SESSION schedules the first refresh, avoiding a duplicate request.
     return () => {
       window.removeEventListener('focus', handleFocus);
       authState.subscription.unsubscribe();
@@ -590,7 +587,7 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
                 >
                   <DropdownMenuLabel style={{ padding: '10px 12px' }}>
                     <span style={{ display: 'block', fontWeight: 600 }}>{data.user.name}</span>
-                    <span style={{ display: 'block', color: '#72808a', fontSize: 12, fontWeight: 400, overflowWrap: 'anywhere' }}>{data.user.email}</span>
+                    <span style={{ display: 'block', color: '#72808a', fontSize: 13, fontWeight: 400, overflowWrap: 'anywhere' }}>{data.user.email}</span>
                   </DropdownMenuLabel>
                   {isAdmin&&<DropdownMenuItem asChild><Link href="/admin"><ShieldCheck/>ศูนย์จัดการ CEO</Link></DropdownMenuItem>}
                   <DropdownMenuSeparator />
