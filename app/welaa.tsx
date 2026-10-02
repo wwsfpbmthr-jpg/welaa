@@ -19,6 +19,7 @@ import { Account, HostCalendar } from './account';
 import { Profile } from './profile';
 import { Admin } from './admin';
 import { supabase } from '@/lib/supabase/client';
+import { useSlowLoading } from '@/hooks/use-slow-loading';
 
 function GoogleBrandMark() {
   return <svg className="google-brand-mark" aria-hidden="true" viewBox="0 0 48 48" width="23" height="23">
@@ -83,6 +84,7 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
   const path = usePathname() || '/';
   const router = useRouter();
   const [isNavigating, startNavigation] = useTransition();
+  const showNavigationLoading = useSlowLoading(isNavigating);
   const [pendingPath, setPendingPath] = useState<string | null>(null);
   const navPath = pendingPath ?? path;
   const activeNavIndex = navPath === '/' ? 0 : navPath === '/search' ? 1 : navPath === '/host/new' ? 2 : navPath === '/account' ? 3 : navPath === '/profile' || navPath === '/host' || navPath === '/host/calendar' ? 4 : -1;
@@ -614,7 +616,7 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
       {error && <div className="data-error">{error} <button className="text-link" onClick={() => void refresh()}>ลองใหม่</button></div>}
 
       <main aria-busy={isNavigating}>{view}</main>
-      {isNavigating && <LoadingDots overlay />}
+      {showNavigationLoading && <LoadingDots overlay />}
       {path !== '/login' && <footer className="footer">
         <div><Logo /><p>พื้นที่มีค่า ทุกเวลา</p></div>
         <div className="footer-links">
