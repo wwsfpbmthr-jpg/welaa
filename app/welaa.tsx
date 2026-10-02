@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 const Checkout = dynamic(() => import('./checkout'));
@@ -11,7 +11,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Toaster, toast } from 'sonner';
 import { AppContext } from './context';
 import { AppData, Space, initial, coordinates, datePlus, today, normalizeActivities } from './data';
-import { Logo } from './ui';
+import { Logo, LoadingDots } from './ui';
 import { Home, SearchPage, HowItWorks } from './views';
 import { Detail } from './detail';
 import { Wizard } from './wizard';
@@ -82,6 +82,7 @@ function mapListing(row: any): Space {
 export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
   const path = usePathname() || '/';
   const router = useRouter();
+  const [isNavigating, startNavigation] = useTransition();
   const [pendingPath, setPendingPath] = useState<string | null>(null);
   const navPath = pendingPath ?? path;
   const activeNavIndex = navPath === '/' ? 0 : navPath === '/search' ? 1 : navPath === '/host/new' ? 2 : navPath === '/account' ? 3 : navPath === '/profile' || navPath === '/host' || navPath === '/host/calendar' ? 4 : -1;
@@ -303,7 +304,7 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
     setRegister(v);
     setAuthMessage('');
     const next = path === '/login' ? '/' : path + window.location.search;
-    router.push(`/login?next=${encodeURIComponent(next)}${v ? '&mode=signup' : ''}`);
+    startNavigation(() => router.push(`/login?next=${encodeURIComponent(next)}${v ? '&mode=signup' : ''}`));
   };
   useEffect(() => { setPendingPath(null); }, [path]);
   useEffect(() => {
@@ -316,7 +317,12 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
     const target = destination.split('?')[0];
     if (target !== path) setPendingPath(target);
   };
-  const go = (destination: string) => { markNav(destination); router.push(destination); };
+  const go = (destination: string) => {
+    const target = new URL(destination, window.location.origin);
+    if (!isNavigating && target.pathname + target.search === path + window.location.search) return;
+    markNav(destination);
+    startNavigation(() => router.push(destination));
+  };
   const signOut = async () => {
     const { error: signOutError } = await supabase.auth.signOut({ scope: 'local' });
     if (signOutError) {
@@ -607,7 +613,8 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
       </header>}
       {error && <div className="data-error">{error} <button className="text-link" onClick={() => void refresh()}>ลองใหม่</button></div>}
 
-      <main>{view}</main>
+      <main aria-busy={isNavigating}>{view}</main>
+      {isNavigating && <LoadingDots overlay />}
       {path !== '/login' && <footer className="footer">
         <div><Logo /><p>พื้นที่มีค่า ทุกเวลา</p></div>
         <div className="footer-links">
@@ -620,12 +627,11 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
         <small className="prototype-note">ส่งคำขอจองให้เจ้าของยืนยัน · ยังไม่มีการเรียกเก็บเงินจริง</small>
       </footer>}
       {path !== '/login' && <nav className={'bottom-nav' + (activeNavIndex < 0 ? ' no-active' : ' active-' + activeNavIndex)} aria-label="เมนูหลัก">
-        <span className="bottom-nav-indicator" aria-hidden="true" />
-        <Link className={'bottom-nav-item' + (activeNavIndex === 0 ? ' active' : '')} href="/" onClick={() => markNav('/')}><Compass />สำรวจ</Link>
-        <Link className={'bottom-nav-item' + (activeNavIndex === 1 ? ' active' : '')} href="/search" onClick={() => markNav('/search')}><Search />ค้นหา</Link>
-        <Link className={'bottom-nav-item add-nav' + (activeNavIndex === 2 ? ' active' : '')} href="/host/new" onClick={() => markNav('/host/new')}><Plus />ปล่อยพื้นที่</Link>
-        <Link className={'bottom-nav-item' + (activeNavIndex === 3 ? ' active' : '')} href="/account?tab=bookings" onClick={(event) => { if (!data.user) { event.preventDefault(); auth(); } else markNav('/account'); }}><CalendarDays />การจอง</Link>
-        <Link className={'bottom-nav-item' + (activeNavIndex === 4 ? ' active' : '')} href="/profile" onClick={() => markNav('/profile')}><UserRound />โปรไฟล์</Link>
+        <Link className={'bottom-nav-item' + (activeNavIndex === 0 ? ' active' : '')} href="/" onNavigate={(event) => { event.preventDefault(); go('/'); }}><Compass />สำรวจ</Link>
+        <Link className={'bottom-nav-item' + (activeNavIndex === 1 ? ' active' : '')} href="/search" onNavigate={(event) => { event.preventDefault(); go('/search'); }}><Search />ค้นหา</Link>
+        <Link className={'bottom-nav-item add-nav' + (activeNavIndex === 2 ? ' active' : '')} href="/host/new" onNavigate={(event) => { event.preventDefault(); go('/host/new'); }}><Plus />ปล่อยพื้นที่</Link>
+        <Link className={'bottom-nav-item' + (activeNavIndex === 3 ? ' active' : '')} href="/account?tab=bookings" onNavigate={(event) => { event.preventDefault(); if (!data.user) auth(); else go('/account?tab=bookings'); }}><CalendarDays />การจอง</Link>
+        <Link className={'bottom-nav-item' + (activeNavIndex === 4 ? ' active' : '')} href="/profile" onNavigate={(event) => { event.preventDefault(); go('/profile'); }}><UserRound />โปรไฟล์</Link>
       </nav>}
       <Toaster position="top-center" richColors />
     </AppContext.Provider>

@@ -7,6 +7,9 @@ import {Select,SelectTrigger,SelectValue,SelectContent,SelectItem} from '@/compo
 import {Checkbox} from '@/components/ui/checkbox';
 import {categories,Space,money,hour,instantInfo} from './data';
 import {useApp} from './context';
+export function LoadingDots({overlay=false}:{overlay?:boolean}){
+  return <div className={'loading-dots'+(overlay?' navigation-loading':'')} role="status" aria-label="กำลังโหลด"><span aria-hidden="true"/><span aria-hidden="true"/><span aria-hidden="true"/></div>;
+}
 const icons=[LayoutGrid,Users,Video,GraduationCap,PartyPopper];
 export function Logo(){return <Link className="brand" href="/" aria-label="WELAA หน้าหลัก"><span className="brand-mark"><img src="/welaa-user-logo.svg" alt=""/></span></Link>}
 export function Choice({value,onChange,options,label}:{value:string;onChange:(v:string)=>void;options:(string|{value:string;label:string})[];label:string}){return <Select value={value} onValueChange={onChange}><SelectTrigger aria-label={label}><SelectValue placeholder={label}/></SelectTrigger><SelectContent>{options.map(o=><SelectItem key={typeof o==='string'?o:o.value} value={typeof o==='string'?o:o.value}>{typeof o==='string'?o:o.label}</SelectItem>)}</SelectContent></Select>}
