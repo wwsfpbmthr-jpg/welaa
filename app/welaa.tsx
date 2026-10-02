@@ -3,7 +3,9 @@
 import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-const Checkout = dynamic(() => import('./checkout'));
+const Checkout = dynamic(() => import('./booking-checkout'));
+const TestCheckout = dynamic(() => import('./checkout'));
+import {safeReturnPath} from '@/lib/navigation';
 const DesignPreview = dynamic(() => import('./design-preview'));
 import { usePathname, useRouter } from 'next/navigation';
 import { FlaskConical, Plus, Search, Compass, CalendarDays, UserRound, ArrowUpRight, ShieldCheck, Menu, House, Heart, CircleHelp, LogOut, Eye, EyeOff } from 'lucide-react';
@@ -294,8 +296,7 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
   }, [refresh]);
 
   const authReturnPath = () => {
-    const next = new URLSearchParams(window.location.search).get('next') || '/';
-    return next.startsWith('/') && !next.startsWith('//') && !next.includes('\\') && !next.startsWith('/login') ? next : '/';
+    return safeReturnPath(new URLSearchParams(window.location.search).get('next'));
   };
   useEffect(() => {
     if (path === '/login') {
@@ -306,6 +307,20 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
       setAuthMessage('');
     }
   }, [path]);
+
+  useEffect(() => {
+    if (!authReady || !data.user) return;
+    if (path === '/login') { router.replace(authReturnPath()); return; }
+    if (path !== '/') return;
+    try {
+      const saved = JSON.parse(sessionStorage.getItem('welaa-auth-return') || 'null');
+      sessionStorage.removeItem('welaa-auth-return');
+      if (saved && Date.now() - saved.at < 30 * 60 * 1000) {
+        const destination = safeReturnPath(saved.path);
+        if (destination !== '/') router.replace(destination);
+      }
+    } catch {}
+  }, [authReady, data.user?.id, path, router]);
 
   const auth = (v = false) => {
     setAuthStep('email');
@@ -421,7 +436,8 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
         window.localStorage.removeItem('welaa-draft');
         result = { id: listing.id };
       } else if (body.action === 'book') {
-        const { data: bookingId, error } = await supabase.rpc('request_booking', {
+        const { data: bookingId, error } = await supabase.rpc('request_booking_reviewed', {
+          p_expected_total: body.expectedTotal,
           p_listing_id: body.spaceId,
           p_date: body.date,
           p_start_hour: body.start,
@@ -440,14 +456,22 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
         });
         if (error) throw error;
       } else if (body.action === 'slots') {
-        const { error } = await supabase.rpc('manage_listing_availability', {
-          p_listing_id: body.spaceId,
-          p_date: body.date,
-          p_hours: body.hours,
-          p_hourly_price: Number(body.price),
-          p_mode: body.mode === 'block' ? 'block' : 'open',
-        });
-        if (error) throw error;
+        const days = [1,7,14,30].includes(body.days) ? body.days : 1;
+        let completed = 0;
+        for (let offset = 0; offset < days; offset++) {
+          const day = new Date(body.date+'T12:00:00Z');
+          day.setUTCDate(day.getUTCDate()+offset);
+          const { error } = await supabase.rpc('manage_listing_availability', {
+            p_listing_id: body.spaceId, p_date: day.toISOString().slice(0,10),
+            p_hours: body.hours, p_hourly_price: Number(body.price),
+            p_mode: body.mode === 'block' ? 'block' : 'open',
+          });
+          if (error) {
+            await refresh();
+            throw new Error(`บันทึกแล้ว ${completed} จาก ${days} วัน: ${error.message}`);
+          }
+          completed++;
+        }
       } else if (body.action === 'profile') {
         const { error } = await supabase.from('profiles').update({
           display_name: body.name,
@@ -473,7 +497,7 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
 
   const favorite = async (id: string) => {
     const saved = data.favorites.includes(id);
-    if (await act({ action: 'favorite', spaceId: id, saved })) {
+    if (await act({ action: 'favorite', spaceId: id, saved: !saved })) {
       toast.success(saved ? 'นำออกจากรายการที่บันทึกแล้ว' : 'บันทึกพื้นที่แล้ว');
     }
   };
@@ -533,9 +557,10 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
     setBusy(true);
     setAuthMessage('');
     try {
+      try { sessionStorage.setItem('welaa-auth-return', JSON.stringify({path:authReturnPath(),at:Date.now()})); } catch {}
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
-        options: { redirectTo: `${window.location.origin}${authReturnPath()}` },
+        options: { redirectTo: window.location.origin + '/' },
       });
       if (error) throw error;
     } catch (e: any) {
@@ -579,7 +604,8 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
   if (path === '/login') view = authView;
   else if (path === '/') view = <Home />;
   else if (path === '/search') view = <SearchPage />;
-  else if (path === '/checkout' && previewMode) view = <Checkout />;
+  else if (path === '/checkout') view = <Checkout />;
+  else if (path === '/checkout/test' && previewMode) view = <TestCheckout />;
   else if (path.startsWith('/spaces/')) view = <Detail id={path.split('/')[2]} />;
   else if (path === '/host/new') view = <Wizard />;
   else if (path === '/host/calendar') view = <HostCalendar />;
@@ -647,7 +673,7 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
           <Link href="/account?tab=bookings">การจอง</Link>
           <span>© {new Date().getFullYear()} WELAA</span>
         </div>
-      {previewMode && <div className="preview-workspace-bar"><FlaskConical size={14}/><span>พรีวิว WELAA · ไม่รับเงินจริง</span><Link href="/checkout?history=1">รายการทดสอบ</Link></div>}
+      {previewMode && <div className="preview-workspace-bar"><FlaskConical size={14}/><span>พรีวิว WELAA · ไม่รับเงินจริง</span><Link href="/checkout/test?history=1">รายการทดสอบ</Link></div>}
         <small className="prototype-note">ส่งคำขอจองให้เจ้าของยืนยัน · ยังไม่มีการเรียกเก็บเงินจริง</small>
       </footer>}
       {path !== '/login' && <nav className={'bottom-nav' + (activeNavIndex < 0 ? ' no-active' : ' active-' + activeNavIndex)} aria-label="เมนูหลัก">

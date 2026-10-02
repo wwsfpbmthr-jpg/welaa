@@ -23,8 +23,8 @@ export function checkoutParams(quote:Quote,method:PaymentMethod,origin:string):S
       {price_data:{currency:'thb',unit_amount:quote.subtotal,product_data:{name:quote.title,description:`${s.date} · ${s.start}:00–${s.end}:00 · ${s.guests} คน (รายการทดสอบ)`}},quantity:1},
       {price_data:{currency:'thb',unit_amount:quote.fee,product_data:{name:'ค่าบริการ WELAA 8% (ทดสอบ)'}},quantity:1},
     ],
-    success_url:origin+'/checkout?stripe_session={CHECKOUT_SESSION_ID}',
-    cancel_url:origin+'/checkout?'+cancel.toString(),
+    success_url:origin+'/checkout/test?stripe_session={CHECKOUT_SESSION_ID}',
+    cancel_url:origin+'/checkout/test?'+cancel.toString(),
     metadata:{purpose:'welaa_preview',title:quote.title.slice(0,500),listingId:s.listingId,date:s.date,start:String(s.start),end:String(s.end),guests:String(s.guests),method,total:String(quote.total)},
     custom_text:{submit:{message:'โหมดทดสอบเท่านั้น ไม่ใช่การจองจริง และไม่มีการเรียกเก็บเงินจริง'}},
   };

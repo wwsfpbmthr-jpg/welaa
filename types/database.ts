@@ -275,6 +275,17 @@ export type Database = {
         }
         Returns: undefined
       }
+      request_booking_reviewed: {
+        Args: {
+          p_expected_total: number
+          p_date: string
+          p_end_hour: number
+          p_guest_count: number
+          p_listing_id: string
+          p_start_hour: number
+        }
+        Returns: string
+      }
       request_booking: {
         Args: {
           p_date: string
