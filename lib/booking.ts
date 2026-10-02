@@ -40,7 +40,7 @@ export function makeQuote(selection: Selection, listing: ListingQuoteSource, ava
 export type BookingStatus = 'awaiting_payment' | 'awaiting_host' | 'confirmed' | 'cancelled';
 export type PaymentStatus = 'unpaid' | 'failed' | 'paid' | 'refund_pending' | 'refunded';
 export type SandboxEvent = 'payment_success' | 'payment_failure' | 'host_accept' | 'cancel' | 'refund_complete';
-export type SandboxBooking = { version:1; id:string; quote:Quote; booking:BookingStatus; payment:PaymentStatus; history:{ event:string; at:number }[] };
+export type SandboxBooking = { version:1; id:string; quote:Quote; method?:'card'|'promptpay'; booking:BookingStatus; payment:PaymentStatus; history:{ event:string; at:number }[] };
 export function beginBooking(quote:Quote,id:string,now=Date.now()):SandboxBooking {
   if (now >= quote.expiresAt) throw new BookingError('ราคาหมดอายุ กรุณาตรวจราคาอีกครั้ง');
   return {version:1,id,quote,booking:'awaiting_payment',payment:'unpaid',history:[{event:'created',at:now}]};
