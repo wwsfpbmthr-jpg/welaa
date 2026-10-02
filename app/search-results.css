@@ -21,3 +21,23 @@
 .discovery-intro{padding-top:14px!important}
 .footer .preview-workspace-bar{flex-basis:100%;width:100%;border:0;padding:4px 0;background:transparent;justify-content:flex-start}
 @media(max-width:640px){.discovery-intro{padding-top:12px!important}.marketplace-navbar .brand-mark{width:64px;height:48px}}
+
+/* Compact logo with the original crop scaled proportionally. */
+.brand .brand-mark,.marketplace-navbar .brand-mark{
+  width:48px;height:36px;
+}
+.brand .brand-mark img{
+  width:92.25px;height:92.25px;left:-21.75px;top:-30px;
+}
+@media(max-width:640px){
+  .brand .brand-mark,.marketplace-navbar .brand-mark{width:44px;height:33px}
+  .brand .brand-mark img{width:84.5625px;height:84.5625px;left:-19.9375px;top:-27.5px}
+}
+/* Slightly stronger text, using the existing locally hosted Thai font. */
+body{font-weight:500}
+.discovery-query input,.query input,.discovery-field label,
+.section-head p,.home-cities .section-head p,.location,
+.discovery-home .space-card .card-title>span,
+.search-page .space-card .card-title>span{font-weight:500}
+.marketplace-navbar nav,.discovery-intro .category,.search-page .category,
+.discovery-search-extra .search-more{font-weight:600}
