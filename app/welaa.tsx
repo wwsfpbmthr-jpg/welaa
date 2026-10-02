@@ -7,7 +7,6 @@ const Checkout = dynamic(() => import('./checkout'));
 const DesignPreview = dynamic(() => import('./design-preview'));
 import { usePathname, useRouter } from 'next/navigation';
 import { FlaskConical, Plus, Search, Compass, CalendarDays, UserRound, ArrowUpRight, ShieldCheck, Menu, House, Heart, CircleHelp, LogOut } from 'lucide-react';
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Toaster, toast } from 'sonner';
 import { AppContext } from './context';
@@ -96,7 +95,6 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
   const lastAuthUserId = useRef<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const [authOpen, setAuthOpen] = useState(false);
   const [register, setRegister] = useState(false);
   const [authName, setAuthName] = useState('');
   const [authEmail, setAuthEmail] = useState('');
@@ -293,10 +291,22 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
     };
   }, [refresh]);
 
+  const authReturnPath = () => {
+    const next = new URLSearchParams(window.location.search).get('next') || '/';
+    return next.startsWith('/') && !next.startsWith('//') && !next.includes('\\') && !next.startsWith('/login') ? next : '/';
+  };
+  useEffect(() => {
+    if (path === '/login') {
+      setRegister(new URLSearchParams(window.location.search).get('mode') === 'signup');
+      setAuthMessage('');
+    }
+  }, [path]);
+
   const auth = (v = false) => {
     setRegister(v);
     setAuthMessage('');
-    setAuthOpen(true);
+    const next = path === '/login' ? '/' : path + window.location.search;
+    router.push(`/login?next=${encodeURIComponent(next)}${v ? '&mode=signup' : ''}`);
   };
   useEffect(() => { setPendingPath(null); }, [path]);
   useEffect(() => {
@@ -481,7 +491,7 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
         });
         if (error) throw error;
       }
-      setAuthOpen(false);
+      router.replace(authReturnPath());
       setAuthName('');
       setAuthEmail('');
       setAuthPassword('');
@@ -500,7 +510,7 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
-        options: { redirectTo: `${window.location.origin}${path}` },
+        options: { redirectTo: `${window.location.origin}${authReturnPath()}` },
       });
       if (error) throw error;
     } catch (e: any) {
@@ -512,8 +522,35 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
 
   if (path === '/design-preview' && previewMode) return <DesignPreview/>;
 
+  const authView = <section className="auth-page">
+    <Link className="auth-back-link" href="/">กลับหน้าหลัก</Link>
+    <div className="auth-page-content">
+          <Logo />
+          <h1 className="auth-title">{register ? 'เริ่มต้นเวลาดี ๆ กับ WELAA' : 'ยินดีต้อนรับกลับ'}</h1>
+          <p className="auth-description">บัญชีเดียวสำหรับผู้เช่าและเจ้าของพื้นที่</p>
+          <form className="stack auth-email-form auth-email-primary" onSubmit={submitAuth}>
+            {register && <label className="field">ชื่อที่แสดง<input required maxLength={80} value={authName} onChange={(e) => setAuthName(e.target.value)} autoComplete="name" /></label>}
+            <label className="field">อีเมล<input required type="email" value={authEmail} onChange={(e) => setAuthEmail(e.target.value)} autoComplete="email" placeholder="name@example.com" /></label>
+            <label className="field">รหัสผ่าน<input required type="password" minLength={8} value={authPassword} onChange={(e) => setAuthPassword(e.target.value)} autoComplete={register ? 'new-password' : 'current-password'} placeholder="รหัสผ่านของคุณ" /></label>
+            {authMessage && <p className="notice" role="status">{authMessage}</p>}
+            <button className="button full" disabled={busy}>{busy ? 'กำลังดำเนินการ…' : register ? 'สมัครสมาชิก' : 'เข้าสู่ระบบ'}</button>
+          </form>
+          <button className="text-link auth-mode-switch" onClick={() => { setRegister(!register); setAuthMessage(''); }}>{register ? 'มีบัญชีแล้ว? เข้าสู่ระบบ' : 'ยังไม่มีบัญชี? สมัครสมาชิก'}</button>
+          <div className="auth-divider auth-divider-compact"><span>หรือ</span></div>
+          <div className="auth-provider-icons" role="group" aria-label="เข้าสู่ระบบด้วยบัญชีอื่น">
+            <button className="auth-social-icon" type="button" aria-label="ดำเนินการต่อด้วย Google" title="ดำเนินการต่อด้วย Google" onClick={() => signInWithProvider('google')} disabled={busy}><GoogleBrandMark /></button>
+            <button className="auth-social-icon" type="button" aria-label="ดำเนินการต่อด้วย Facebook" title="ดำเนินการต่อด้วย Facebook" onClick={() => signInWithProvider('facebook')} disabled={busy}><FacebookBrandMark /></button>
+            <button className="auth-social-icon" type="button" aria-label={appleAuthEnabled ? 'ดำเนินการต่อด้วย Apple' : 'Apple ID ยังไม่เปิดให้บริการ'} title={appleAuthEnabled ? 'ดำเนินการต่อด้วย Apple' : 'Apple ID ยังไม่เปิดให้บริการ'} aria-describedby={!appleAuthEnabled ? 'apple-auth-status' : undefined} onClick={() => signInWithProvider('apple')} disabled={busy || !appleAuthEnabled}><AppleBrandMark /></button>
+          </div>
+          {!appleAuthEnabled && <p id="apple-auth-status" className="auth-apple-status">Apple ID · เร็ว ๆ นี้</p>}
+          <p className="small muted mt">การจองเป็นคำขอรอเจ้าของยืนยัน และยังไม่มีการชำระเงินจริง</p>
+
+    </div>
+  </section>;
+
   let view;
-  if (path === '/') view = <Home />;
+  if (path === '/login') view = authView;
+  else if (path === '/') view = <Home />;
   else if (path === '/search') view = <SearchPage />;
   else if (path === '/checkout' && previewMode) view = <Checkout />;
   else if (path.startsWith('/spaces/')) view = <Detail id={path.split('/')[2]} />;
@@ -527,7 +564,7 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
 
   return (
     <AppContext.Provider value={{ data, all: data.spaces, previewMode, ready, authReady, busy, act, refresh, auth, go, favorite, signOut }}>
-      <header className="navbar marketplace-navbar">
+      {path !== '/login' && <header className="navbar marketplace-navbar">
         <Logo />
         <nav aria-label="เมนูหลักบนคอมพิวเตอร์"><Link aria-current={path==='/search'?'page':undefined} href="/search">ค้นหาพื้นที่</Link><Link href="/host/new">ปล่อยพื้นที่</Link><Link aria-current={path==='/how-it-works'?'page':undefined} href="/how-it-works">วิธีใช้งาน</Link></nav>
         {!authReady
@@ -570,11 +607,11 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
               </DropdownMenu>
             </>
           : <button className="button" onClick={() => auth()} aria-label="เข้าสู่ระบบหรือสมัครสมาชิก">เข้าสู่ระบบ</button>}
-      </header>
+      </header>}
       {error && <div className="data-error">{error} <button className="text-link" onClick={() => void refresh()}>ลองใหม่</button></div>}
 
       <main>{view}</main>
-      <footer className="footer">
+      {path !== '/login' && <footer className="footer">
         <div><Logo /><p>พื้นที่มีค่า ทุกเวลา</p></div>
         <div className="footer-links">
           <Link href="/how-it-works">รู้จัก WELAA</Link>
@@ -584,43 +621,15 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
         </div>
       {previewMode && <div className="preview-workspace-bar"><FlaskConical size={14}/><span>พรีวิว WELAA · ไม่รับเงินจริง</span><Link href="/checkout?history=1">รายการทดสอบ</Link></div>}
         <small className="prototype-note">ส่งคำขอจองให้เจ้าของยืนยัน · ยังไม่มีการเรียกเก็บเงินจริง</small>
-      </footer>
-      <nav className={'bottom-nav' + (activeNavIndex < 0 ? ' no-active' : ' active-' + activeNavIndex)} aria-label="เมนูหลัก">
+      </footer>}
+      {path !== '/login' && <nav className={'bottom-nav' + (activeNavIndex < 0 ? ' no-active' : ' active-' + activeNavIndex)} aria-label="เมนูหลัก">
         <span className="bottom-nav-indicator" aria-hidden="true" />
         <Link className={'bottom-nav-item' + (activeNavIndex === 0 ? ' active' : '')} href="/" onClick={() => markNav('/')}><Compass />สำรวจ</Link>
         <Link className={'bottom-nav-item' + (activeNavIndex === 1 ? ' active' : '')} href="/search" onClick={() => markNav('/search')}><Search />ค้นหา</Link>
         <Link className={'bottom-nav-item add-nav' + (activeNavIndex === 2 ? ' active' : '')} href="/host/new" onClick={() => markNav('/host/new')}><Plus />ปล่อยพื้นที่</Link>
         <Link className={'bottom-nav-item' + (activeNavIndex === 3 ? ' active' : '')} href="/account?tab=bookings" onClick={(event) => { if (!data.user) { event.preventDefault(); auth(); } else markNav('/account'); }}><CalendarDays />การจอง</Link>
         <Link className={'bottom-nav-item' + (activeNavIndex === 4 ? ' active' : '')} href="/profile" onClick={() => markNav('/profile')}><UserRound />โปรไฟล์</Link>
-      </nav>
-      <Dialog open={authOpen} onOpenChange={(open) => {
-        setAuthOpen(open);
-        if (!open) {
-                setAuthMessage('');
-        }
-      }}>
-        <DialogContent className="auth-dialog">
-          <Logo />
-          <DialogTitle className="auth-title">{register ? 'เริ่มต้นเวลาดี ๆ กับ WELAA' : 'ยินดีต้อนรับกลับ'}</DialogTitle>
-          <DialogDescription>บัญชีเดียวสำหรับผู้เช่าและเจ้าของพื้นที่</DialogDescription>
-          <form className="stack auth-email-form auth-email-primary" onSubmit={submitAuth}>
-            {register && <label className="field">ชื่อที่แสดง<input required maxLength={80} value={authName} onChange={(e) => setAuthName(e.target.value)} autoComplete="name" /></label>}
-            <label className="field">อีเมล<input required type="email" value={authEmail} onChange={(e) => setAuthEmail(e.target.value)} autoComplete="email" placeholder="name@example.com" /></label>
-            <label className="field">รหัสผ่าน<input required type="password" minLength={8} value={authPassword} onChange={(e) => setAuthPassword(e.target.value)} autoComplete={register ? 'new-password' : 'current-password'} placeholder="รหัสผ่านของคุณ" /></label>
-            {authMessage && <p className="notice" role="status">{authMessage}</p>}
-            <button className="button full" disabled={busy}>{busy ? 'กำลังดำเนินการ…' : register ? 'สมัครสมาชิก' : 'เข้าสู่ระบบ'}</button>
-          </form>
-          <button className="text-link auth-mode-switch" onClick={() => { setRegister(!register); setAuthMessage(''); }}>{register ? 'มีบัญชีแล้ว? เข้าสู่ระบบ' : 'ยังไม่มีบัญชี? สมัครสมาชิก'}</button>
-          <div className="auth-divider auth-divider-compact"><span>หรือ</span></div>
-          <div className="auth-provider-icons" role="group" aria-label="เข้าสู่ระบบด้วยบัญชีอื่น">
-            <button className="auth-social-icon" type="button" aria-label="ดำเนินการต่อด้วย Google" title="ดำเนินการต่อด้วย Google" onClick={() => signInWithProvider('google')} disabled={busy}><GoogleBrandMark /></button>
-            <button className="auth-social-icon" type="button" aria-label="ดำเนินการต่อด้วย Facebook" title="ดำเนินการต่อด้วย Facebook" onClick={() => signInWithProvider('facebook')} disabled={busy}><FacebookBrandMark /></button>
-            <button className="auth-social-icon" type="button" aria-label={appleAuthEnabled ? 'ดำเนินการต่อด้วย Apple' : 'Apple ID ยังไม่เปิดให้บริการ'} title={appleAuthEnabled ? 'ดำเนินการต่อด้วย Apple' : 'Apple ID ยังไม่เปิดให้บริการ'} aria-describedby={!appleAuthEnabled ? 'apple-auth-status' : undefined} onClick={() => signInWithProvider('apple')} disabled={busy || !appleAuthEnabled}><AppleBrandMark /></button>
-          </div>
-          {!appleAuthEnabled && <p id="apple-auth-status" className="auth-apple-status">Apple ID · เร็ว ๆ นี้</p>}
-          <p className="small muted mt">การจองเป็นคำขอรอเจ้าของยืนยัน และยังไม่มีการชำระเงินจริง</p>
-        </DialogContent>
-      </Dialog>
+      </nav>}
       <Toaster position="top-center" richColors />
     </AppContext.Provider>
   );
