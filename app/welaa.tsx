@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 const Checkout = dynamic(() => import('./checkout'));
 const DesignPreview = dynamic(() => import('./design-preview'));
 import { usePathname, useRouter } from 'next/navigation';
-import { FlaskConical, Plus, Search, Compass, CalendarDays, UserRound, ArrowUpRight, ShieldCheck, Menu, House, Heart, CircleHelp, LogOut, Mail, ChevronDown } from 'lucide-react';
+import { FlaskConical, Plus, Search, Compass, CalendarDays, UserRound, ArrowUpRight, ShieldCheck, Menu, House, Heart, CircleHelp, LogOut } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Toaster, toast } from 'sonner';
@@ -36,6 +36,12 @@ function FacebookBrandMark() {
     <path fill="#fff" d="M13.4 21v-8h2.7l.4-3.1h-3.1v-2c0-.9.3-1.5 1.6-1.5h1.7V3.6c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.2v2.2H7.6V13h2.7v8h3.1Z"/>
   </svg>;
 }
+
+function AppleBrandMark() {
+  return <svg className="apple-brand-mark" aria-hidden="true" viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M17.05 12.54c.02 3.26 2.86 4.34 2.89 4.36-.02.08-.45 1.55-1.49 3.07-.9 1.31-1.83 2.62-3.3 2.64-1.45.03-1.92-.86-3.58-.86-1.65 0-2.17.83-3.55.89-1.42.05-2.51-1.42-3.42-2.72C2.73 17.25 1.3 12.36 3.22 9.06a5.3 5.3 0 0 1 4.5-2.72c1.41-.03 2.75.95 3.61.95.86 0 2.48-1.18 4.19-1.01.72.03 2.74.29 4.03 2.2-.1.06-2.4 1.39-2.37 4.06h-.13ZM14.33 4.55c.76-.91 1.27-2.18 1.13-3.44-1.09.04-2.41.73-3.19 1.64-.7.8-1.32 2.09-1.15 3.32 1.21.09 2.45-.62 3.21-1.52Z"/></svg>;
+}
+
+const appleAuthEnabled = process.env.NEXT_PUBLIC_APPLE_AUTH_ENABLED === 'true';
 
 function imageUrl(path?: string) {
   if (!path) return '/favicon.svg';
@@ -96,7 +102,6 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [authMessage, setAuthMessage] = useState('');
-  const [emailAuthOpen, setEmailAuthOpen] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -291,7 +296,6 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
   const auth = (v = false) => {
     setRegister(v);
     setAuthMessage('');
-    setEmailAuthOpen(false);
     setAuthOpen(true);
   };
   useEffect(() => { setPendingPath(null); }, [path]);
@@ -490,7 +494,7 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
     }
   };
 
-  const signInWithProvider = async (provider: 'google' | 'facebook') => {
+  const signInWithProvider = async (provider: 'google' | 'facebook' | 'apple') => {
     setBusy(true);
     setAuthMessage('');
     try {
@@ -500,7 +504,7 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
       });
       if (error) throw error;
     } catch (e: any) {
-      const providerName = provider === 'facebook' ? 'Facebook' : 'Google';
+      const providerName = provider === 'apple' ? 'Apple' : provider === 'facebook' ? 'Facebook' : 'Google';
       setAuthMessage(e?.message || `เข้าสู่ระบบด้วย ${providerName} ไม่สำเร็จ`);
       setBusy(false);
     }
@@ -592,43 +596,28 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
       <Dialog open={authOpen} onOpenChange={(open) => {
         setAuthOpen(open);
         if (!open) {
-          setEmailAuthOpen(false);
-          setAuthMessage('');
+                setAuthMessage('');
         }
       }}>
         <DialogContent className="auth-dialog">
           <Logo />
           <DialogTitle className="auth-title">{register ? 'เริ่มต้นเวลาดี ๆ กับ WELAA' : 'ยินดีต้อนรับกลับ'}</DialogTitle>
           <DialogDescription>บัญชีเดียวสำหรับผู้เช่าและเจ้าของพื้นที่</DialogDescription>
-          <div className="auth-provider-list">
-            <button className="button full google-button" type="button" onClick={() => signInWithProvider('google')} disabled={busy}><GoogleBrandMark />ดำเนินการต่อด้วย Google</button>
-            <button className="button full facebook-button" type="button" onClick={() => signInWithProvider('facebook')} disabled={busy}><FacebookBrandMark />ดำเนินการต่อด้วย Facebook</button>
-          </div>
-          {authMessage && !emailAuthOpen && <p className="notice auth-provider-message">{authMessage}</p>}
+          <form className="stack auth-email-form auth-email-primary" onSubmit={submitAuth}>
+            {register && <label className="field">ชื่อที่แสดง<input required maxLength={80} value={authName} onChange={(e) => setAuthName(e.target.value)} autoComplete="name" /></label>}
+            <label className="field">อีเมล<input required type="email" value={authEmail} onChange={(e) => setAuthEmail(e.target.value)} autoComplete="email" placeholder="name@example.com" /></label>
+            <label className="field">รหัสผ่าน<input required type="password" minLength={8} value={authPassword} onChange={(e) => setAuthPassword(e.target.value)} autoComplete={register ? 'new-password' : 'current-password'} placeholder="รหัสผ่านของคุณ" /></label>
+            {authMessage && <p className="notice" role="status">{authMessage}</p>}
+            <button className="button full" disabled={busy}>{busy ? 'กำลังดำเนินการ…' : register ? 'สมัครสมาชิก' : 'เข้าสู่ระบบ'}</button>
+          </form>
+          <button className="text-link auth-mode-switch" onClick={() => { setRegister(!register); setAuthMessage(''); }}>{register ? 'มีบัญชีแล้ว? เข้าสู่ระบบ' : 'ยังไม่มีบัญชี? สมัครสมาชิก'}</button>
           <div className="auth-divider auth-divider-compact"><span>หรือ</span></div>
-          <button
-            className="email-auth-toggle"
-            type="button"
-            aria-expanded={emailAuthOpen}
-            onClick={() => {
-              setEmailAuthOpen((open) => !open);
-              setAuthMessage('');
-            }}
-          >
-            <Mail size={17} />
-            <span>ใช้อีเมล{emailAuthOpen ? '' : 'แทน'}</span>
-            <ChevronDown className={emailAuthOpen ? 'email-auth-chevron open' : 'email-auth-chevron'} size={17} />
-          </button>
-          {emailAuthOpen && (
-            <form className="stack auth-email-form" onSubmit={submitAuth}>
-              {register && <label className="field">ชื่อที่แสดง<input required maxLength={80} value={authName} onChange={(e) => setAuthName(e.target.value)} autoComplete="name" /></label>}
-              <label className="field">อีเมล<input required type="email" value={authEmail} onChange={(e) => setAuthEmail(e.target.value)} autoComplete="email" /></label>
-              <label className="field">รหัสผ่าน<input required type="password" minLength={8} value={authPassword} onChange={(e) => setAuthPassword(e.target.value)} autoComplete={register ? 'new-password' : 'current-password'} /></label>
-              {authMessage && <p className="notice">{authMessage}</p>}
-              <button className="button full" disabled={busy}>{busy ? 'กำลังดำเนินการ…' : register ? 'สมัครสมาชิก' : 'เข้าสู่ระบบ'}<ArrowUpRight size={18} /></button>
-            </form>
-          )}
-          <button className="text-link mt" onClick={() => { setRegister(!register); setAuthMessage(''); }}>{register ? 'มีบัญชีแล้ว? เข้าสู่ระบบ' : 'ยังไม่มีบัญชี? สมัครสมาชิก'}</button>
+          <div className="auth-provider-icons" role="group" aria-label="เข้าสู่ระบบด้วยบัญชีอื่น">
+            <button className="auth-social-icon" type="button" aria-label="ดำเนินการต่อด้วย Google" title="ดำเนินการต่อด้วย Google" onClick={() => signInWithProvider('google')} disabled={busy}><GoogleBrandMark /></button>
+            <button className="auth-social-icon" type="button" aria-label="ดำเนินการต่อด้วย Facebook" title="ดำเนินการต่อด้วย Facebook" onClick={() => signInWithProvider('facebook')} disabled={busy}><FacebookBrandMark /></button>
+            <button className="auth-social-icon" type="button" aria-label={appleAuthEnabled ? 'ดำเนินการต่อด้วย Apple' : 'Apple ID ยังไม่เปิดให้บริการ'} title={appleAuthEnabled ? 'ดำเนินการต่อด้วย Apple' : 'Apple ID ยังไม่เปิดให้บริการ'} aria-describedby={!appleAuthEnabled ? 'apple-auth-status' : undefined} onClick={() => signInWithProvider('apple')} disabled={busy || !appleAuthEnabled}><AppleBrandMark /></button>
+          </div>
+          {!appleAuthEnabled && <p id="apple-auth-status" className="auth-apple-status">Apple ID · เร็ว ๆ นี้</p>}
           <p className="small muted mt">การจองเป็นคำขอรอเจ้าของยืนยัน และยังไม่มีการชำระเงินจริง</p>
         </DialogContent>
       </Dialog>
