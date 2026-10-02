@@ -111,3 +111,26 @@ body{font-weight:500}
 .navigation-loading{position:fixed;inset:0;z-index:29;background:#fff;min-height:0}
 @keyframes loading-dot-pulse{0%,80%,100%{opacity:.35;transform:translateY(0)}40%{opacity:1;transform:translateY(-5px)}}
 @media(prefers-reduced-motion:reduce){.loading-dots>span{animation:none;opacity:.7}}
+
+/* Compact, full-page authentication with one form step at a time. */
+.auth-main{padding-bottom:0}
+.auth-page{min-height:100dvh;padding:12px 24px calc(28px + env(safe-area-inset-bottom,0px))}
+.auth-page-content{max-width:380px!important;margin-top:16px;gap:12px}
+.auth-page-content>.brand{min-height:32px;margin-bottom:2px}
+.auth-page-content .auth-title{font-size:25px;line-height:1.45}
+.auth-description{font-size:14px;line-height:1.6}
+.auth-page-content .auth-email-primary{margin-top:6px;gap:12px}
+.auth-page-content .auth-email-primary input{min-height:44px;padding:10px 12px;font-size:16px}
+.auth-page-content .auth-email-primary>.button{min-height:44px;padding:10px 16px}
+.auth-page-content .auth-mode-switch{font-size:14px}
+.auth-page-content .auth-divider{margin:4px 0}
+.auth-social-icon{width:48px;height:48px;border-radius:12px}
+.auth-identity{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;font-size:14px}
+.auth-identity>span,.auth-confirmation>strong{overflow-wrap:anywhere;min-width:0}
+.auth-identity>button{flex:none}
+.auth-password-field{position:relative}
+.auth-page-content .auth-password-field input{padding-right:48px}
+.auth-password-toggle{position:absolute;right:0;top:0;width:44px;height:100%;display:grid;place-items:center;color:#536879}
+.auth-confirmation{display:grid;gap:12px;font-size:14px}
+@media(max-width:640px){.auth-page-content{margin-top:12px;gap:12px}.auth-page-content .auth-title{font-size:23px}}
+@media(max-height:700px){.auth-page-content{margin-top:4px;gap:10px}.auth-page-content>.brand{margin-bottom:0}}

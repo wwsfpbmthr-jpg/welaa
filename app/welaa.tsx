@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 const Checkout = dynamic(() => import('./checkout'));
 const DesignPreview = dynamic(() => import('./design-preview'));
 import { usePathname, useRouter } from 'next/navigation';
-import { FlaskConical, Plus, Search, Compass, CalendarDays, UserRound, ArrowUpRight, ShieldCheck, Menu, House, Heart, CircleHelp, LogOut } from 'lucide-react';
+import { FlaskConical, Plus, Search, Compass, CalendarDays, UserRound, ArrowUpRight, ShieldCheck, Menu, House, Heart, CircleHelp, LogOut, Eye, EyeOff } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Toaster, toast } from 'sonner';
 import { AppContext } from './context';
@@ -103,6 +103,8 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [authMessage, setAuthMessage] = useState('');
+  const [authStep, setAuthStep] = useState<'email' | 'credentials' | 'confirmation'>('email');
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -297,12 +299,18 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
   };
   useEffect(() => {
     if (path === '/login') {
+      setAuthStep('email');
+      setAuthPassword('');
+      setShowPassword(false);
       setRegister(new URLSearchParams(window.location.search).get('mode') === 'signup');
       setAuthMessage('');
     }
   }, [path]);
 
   const auth = (v = false) => {
+    setAuthStep('email');
+    setAuthPassword('');
+    setShowPassword(false);
     setRegister(v);
     setAuthMessage('');
     const next = path === '/login' ? '/' : path + window.location.search;
@@ -472,6 +480,15 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
 
   const submitAuth = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (busy) return;
+    if (authStep === 'email') {
+      setAuthEmail(authEmail.trim());
+      setAuthMessage('');
+      setAuthStep('credentials');
+      return;
+    }
+    if (authStep !== 'credentials') return;
+    if (register && !authName.trim()) { setAuthMessage('กรุณาใส่ชื่อที่แสดง'); return; }
     setBusy(true);
     setAuthMessage('');
     try {
@@ -486,7 +503,10 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
         });
         if (error) throw error;
         if (!result.session) {
-          setAuthMessage('สมัครแล้ว กรุณากดยืนยันจากลิงก์ที่ส่งไปยังอีเมลของคุณ');
+          setAuthStep('confirmation');
+          setAuthPassword('');
+          setShowPassword(false);
+          setAuthMessage('กรุณากดยืนยันจากลิงก์ในอีเมล หากมีบัญชีอยู่แล้วให้กลับไปเข้าสู่ระบบ');
           return;
         }
       } else {
@@ -531,16 +551,18 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
     <Link className="auth-back-link" href="/">กลับหน้าหลัก</Link>
     <div className="auth-page-content">
           <Logo />
-          <h1 className="auth-title">{register ? 'เริ่มต้นเวลาดี ๆ กับ WELAA' : 'ยินดีต้อนรับกลับ'}</h1>
-          <p className="auth-description">บัญชีเดียวสำหรับผู้เช่าและเจ้าของพื้นที่</p>
-          <form className="stack auth-email-form auth-email-primary" onSubmit={submitAuth}>
-            {register && <label className="field">ชื่อที่แสดง<input required maxLength={80} value={authName} onChange={(e) => setAuthName(e.target.value)} autoComplete="name" /></label>}
-            <label className="field">อีเมล<input required type="email" value={authEmail} onChange={(e) => setAuthEmail(e.target.value)} autoComplete="email" placeholder="name@example.com" /></label>
-            <label className="field">รหัสผ่าน<input required type="password" minLength={8} value={authPassword} onChange={(e) => setAuthPassword(e.target.value)} autoComplete={register ? 'new-password' : 'current-password'} placeholder="รหัสผ่านของคุณ" /></label>
+          <h1 className="auth-title">{authStep === 'confirmation' ? 'ยืนยันอีเมลของคุณ' : authStep === 'credentials' ? register ? 'สร้างบัญชีของคุณ' : 'ใส่รหัสผ่าน' : 'เข้าสู่ระบบหรือสมัครสมาชิก'}</h1>
+          <p className="auth-description">{authStep === 'email' ? 'เริ่มต้นด้วยอีเมลของคุณ' : authStep === 'confirmation' ? 'ตรวจกล่องจดหมายและโฟลเดอร์สแปม' : register ? 'เพิ่มชื่อและตั้งรหัสผ่านเพื่อเริ่มต้น' : 'เข้าสู่บัญชี WELAA ของคุณ'}</p>
+          {authStep !== 'confirmation' ? <form className="stack auth-email-form auth-email-primary" onSubmit={submitAuth}>
+            {authStep === 'email' ? <label className="field">อีเมล<input required type="email" maxLength={254} value={authEmail} onChange={(e) => setAuthEmail(e.target.value)} autoComplete="email" inputMode="email" autoCapitalize="none" spellCheck={false} placeholder="name@example.com" /></label> : <>
+              <div className="auth-identity"><span>{authEmail}</span><button type="button" className="text-link" disabled={busy} onClick={() => { setAuthStep('email'); setAuthPassword(''); setShowPassword(false); setAuthMessage(''); }}>แก้ไข</button></div>
+              {register && <label className="field">ชื่อที่แสดง<input required maxLength={80} value={authName} onChange={(e) => setAuthName(e.target.value)} autoComplete="name" autoFocus disabled={busy}/></label>}
+              <label className="field">{register ? 'ตั้งรหัสผ่าน' : 'รหัสผ่าน'}<div className="auth-password-field"><input required type={showPassword ? 'text' : 'password'} minLength={register ? 8 : 1} value={authPassword} onChange={(e) => setAuthPassword(e.target.value)} autoComplete={register ? 'new-password' : 'current-password'} autoFocus={!register} disabled={busy} placeholder={register ? 'อย่างน้อย 8 ตัวอักษร' : 'รหัสผ่านของคุณ'} /><button type="button" className="auth-password-toggle" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน'} aria-pressed={showPassword}>{showPassword ? <EyeOff size={18}/> : <Eye size={18}/>}</button></div></label>
+            </>}
             {authMessage && <p className="notice" role="status">{authMessage}</p>}
-            <button className="button full" disabled={busy}>{busy ? 'กำลังดำเนินการ…' : register ? 'สมัครสมาชิก' : 'เข้าสู่ระบบ'}</button>
-          </form>
-          <button className="text-link auth-mode-switch" onClick={() => { setRegister(!register); setAuthMessage(''); }}>{register ? 'มีบัญชีแล้ว? เข้าสู่ระบบ' : 'ยังไม่มีบัญชี? สมัครสมาชิก'}</button>
+            <button className="button full" disabled={busy}>{busy ? 'กำลังดำเนินการ…' : authStep === 'email' ? 'ต่อไป' : register ? 'สมัครสมาชิก' : 'เข้าสู่ระบบ'}</button>
+          </form> : <div className="auth-confirmation"><strong>{authEmail}</strong><p className="notice" role="status">{authMessage}</p><button className="button full" onClick={() => { setRegister(false); setAuthStep('credentials'); setAuthMessage(''); }}>กลับไปเข้าสู่ระบบ</button></div>}
+          {authStep !== 'confirmation' && <button className="text-link auth-mode-switch" disabled={busy} onClick={() => { setRegister(!register); setAuthPassword(''); setShowPassword(false); setAuthMessage(''); }}>{register ? 'มีบัญชีแล้ว? เข้าสู่ระบบ' : 'ยังไม่มีบัญชี? สมัครสมาชิก'}</button>}
           <div className="auth-divider auth-divider-compact"><span>หรือ</span></div>
           <div className="auth-provider-icons" role="group" aria-label="เข้าสู่ระบบด้วยบัญชีอื่น">
             <button className="auth-social-icon" type="button" aria-label="ดำเนินการต่อด้วย Google" title="ดำเนินการต่อด้วย Google" onClick={() => signInWithProvider('google')} disabled={busy}><GoogleBrandMark /></button>
@@ -548,7 +570,7 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
             <button className="auth-social-icon" type="button" aria-label={appleAuthEnabled ? 'ดำเนินการต่อด้วย Apple' : 'Apple ID ยังไม่เปิดให้บริการ'} title={appleAuthEnabled ? 'ดำเนินการต่อด้วย Apple' : 'Apple ID ยังไม่เปิดให้บริการ'} aria-describedby={!appleAuthEnabled ? 'apple-auth-status' : undefined} onClick={() => signInWithProvider('apple')} disabled={busy || !appleAuthEnabled}><AppleBrandMark /></button>
           </div>
           {!appleAuthEnabled && <p id="apple-auth-status" className="auth-apple-status">Apple ID · เร็ว ๆ นี้</p>}
-          <p className="small muted mt">การจองเป็นคำขอรอเจ้าของยืนยัน และยังไม่มีการชำระเงินจริง</p>
+
 
     </div>
   </section>;
@@ -615,7 +637,7 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
       </header>}
       {error && <div className="data-error">{error} <button className="text-link" onClick={() => void refresh()}>ลองใหม่</button></div>}
 
-      <main aria-busy={isNavigating}>{view}</main>
+      <main className={path === '/login' ? 'auth-main' : undefined} aria-busy={isNavigating}>{view}</main>
       {showNavigationLoading && <LoadingDots overlay />}
       {path !== '/login' && <footer className="footer">
         <div><Logo /><p>พื้นที่มีค่า ทุกเวลา</p></div>
