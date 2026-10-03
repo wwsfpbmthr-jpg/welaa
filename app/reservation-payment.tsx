@@ -1,5 +1,6 @@
 'use client';
 
+import { PaymentMark } from './payment-mark';
 import { useState, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -46,7 +47,7 @@ export function ReservationPayment({ id }: { id: string }) {
     </section><section className="outline-panel stack">
       {paid ? <><div className="success-icon"><Check/></div><h2>{cancelled ? 'การจองถูกยกเลิก' : 'ชำระเงินแล้ว (ทดสอบ)'}</h2><p>วิธีชำระ: {(payment?.method || method) === 'card' ? 'บัตรเครดิต / เดบิต' : 'พร้อมเพย์'}</p><p className="small muted checkout-reference">เลขอ้างอิง {payment?.id || receipt}</p><p className="notice">{cancelled ? 'ไม่มีการคืนเงินจริง เพราะรายการนี้เป็นการทดสอบ' : 'รายการนี้เป็นการทดสอบ ไม่มีการตัดบัตรหรือโอนเงินจริง'}</p><Link className="button full" href="/account?tab=bookings">ดูการจองของฉัน</Link></> : !eligible ? <><h2>{booking.status === 'pending' ? 'รอเจ้าของอนุมัติ' : cancelled ? 'การจองนี้ถูกยกเลิกหรือปฏิเสธแล้ว' : 'พ้นเวลาชำระเงินแล้ว'}</h2><p className="muted">{booking.status === 'pending' ? 'เมื่อเจ้าของอนุมัติ ปุ่มชำระเงินจะปรากฏในการจองของฉัน' : 'รายการนี้ไม่สามารถชำระเงินได้'}</p><Link className="button secondary" href="/account">กลับไปการจอง</Link></> : <>
         <h2>เลือกวิธีชำระเงิน</h2>
-        <fieldset className="payment-methods"><legend className="sr-only">วิธีชำระเงิน</legend>{(['card','promptpay'] as const).map(value => <label key={value} className={'payment-method '+(method===value?'selected':'')}><input type="radio" name="payment-method" value={value} checked={method===value} onChange={() => {setMethod(value);setError('');}}/>{value==='card'?<CreditCard/>:<QrCode/>}<span><b>{value==='card'?'บัตรเครดิต / เดบิต':'พร้อมเพย์'}</b><small>{value==='card'?'ทดสอบการชำระด้วยบัตร':'ทดสอบขั้นตอน QR Payment'}</small></span></label>)}</fieldset>
+        <fieldset className="payment-methods"><legend className="sr-only">วิธีชำระเงิน</legend>{(['card','promptpay'] as const).map(value => <label key={value} className={'payment-method '+(method===value?'selected':'')}><input type="radio" name="payment-method" value={value} checked={method===value} onChange={() => {setMethod(value);setError('');}}/><PaymentMark method={value}/><span><b>{value==='card'?'บัตรเครดิต / เดบิต':'พร้อมเพย์'}</b><small>{value==='card'?'บัตรเครดิตและบัตรเดบิต':'สแกน QR ด้วยแอปธนาคาร'}</small></span></label>)}</fieldset>
         {method==='card' ? <div className="test-payment-panel"><CreditCard size={28}/><b>บัตรทดสอบ •••• 4242</b><p>ใช้บัตรตัวอย่างนี้เพื่อทดลองขั้นตอน ไม่ต้องกรอกข้อมูลบัตรจริง</p></div> : <div className="test-payment-panel"><QrCode size={58}/><b>พร้อมเพย์โหมดทดสอบ</b><p>เมื่อเชื่อมผู้ให้บริการ ระบบจะแสดง QR สำหรับยอดนี้ ตอนนี้กดปุ่มด้านล่างเพื่อจำลองการจ่ายสำเร็จ</p></div>}
         {error && <p className="notice" role="alert">{error}</p>}
         <button className="button full" disabled={busy || submitting} onClick={() => void pay()}>{submitting?<Loader2 className="spin" size={18}/>:<ShieldCheck size={18}/>} {submitting?'กำลังบันทึก…':`ชำระเงินทดสอบ ฿${money(booking.total)}`}</button>
