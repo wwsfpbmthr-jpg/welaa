@@ -137,7 +137,7 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
       let listingQuery = supabase.from('listings').select('*').order('created_at', { ascending: false });
       if (user) listingQuery = listingQuery.or(`status.eq.published,owner_id.eq.${user.id}`);
       else listingQuery = listingQuery.eq('status', 'published');
-      const [profileResult, listingsData, bookingsResult, favoritesResult] = await Promise.all([
+      const [profileResult, listingsData, bookingsResult, favoritesResult, paymentsResult] = await Promise.all([
         user ? supabase.from('profiles').select('*').eq('id', user.id).maybeSingle() : Promise.resolve({ data: null, error: null }),
         (async () => {
           const result = await listingQuery;
@@ -153,10 +153,13 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
         })(),
         user ? supabase.from('bookings').select('*').order('created_at', { ascending: false }) : Promise.resolve({ data: [], error: null }),
         user ? supabase.from('favorites').select('listing_id') : Promise.resolve({ data: [], error: null }),
+        user ? (supabase as any).from('demo_payments').select('id,booking_id,method,amount,created_at') : Promise.resolve({ data: [], error: null }),
       ]);
       if (profileResult.error) throw profileResult.error;
       if (bookingsResult.error) throw bookingsResult.error;
       if (favoritesResult.error) throw favoritesResult.error;
+      if (paymentsResult.error) throw paymentsResult.error;
+      const paymentRows: any[] = paymentsResult.data ?? [];
       const profile = profileResult.data;
       const listingRows = listingsData.rows;
       const availabilityRows = listingsData.availability;
@@ -182,6 +185,7 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
         fee: row.service_fee,
         total: row.total,
         status: row.status,
+        payment: paymentRows.find(payment => payment.booking_id === row.id) ?? null,
         created_at: row.created_at,
       }));
       const occupied = mappedBookings
@@ -287,9 +291,11 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
     const handleFocus = () => {
       if (Date.now() - lastRefreshAt.current > 60_000) void refresh();
     };
+    const interval = window.setInterval(() => { if (document.visibilityState === 'visible' && (/^\/(account|host|checkout)/).test(window.location.pathname)) void refresh(); }, 15000);
     window.addEventListener('focus', handleFocus);
     // INITIAL_SESSION schedules the first refresh, avoiding a duplicate request.
     return () => {
+      window.clearInterval(interval);
       window.removeEventListener('focus', handleFocus);
       authState.subscription.unsubscribe();
     };
@@ -446,6 +452,10 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
         });
         if (error) throw error;
         result = { id: bookingId };
+      } else if (body.action === 'pay-demo') {
+        const { data: paymentId, error } = await (supabase as any).rpc('complete_demo_payment', { p_booking_id: body.id, p_method: body.method });
+        if (error) throw error;
+        result = { id: paymentId };
       } else if (body.action === 'cancel') {
         const { error } = await supabase.rpc('cancel_booking', { p_booking_id: body.id });
         if (error) throw error;
