@@ -1621,3 +1621,35 @@ main:focus {
 .gallery-side button .v2-image-fallback {
   min-height: 130px;
 }
+.design-preview-workspace > header {
+  flex-wrap: wrap;
+  height: auto;
+  min-height: 72px;
+  gap: 16px;
+  padding: 16px 24px;
+}
+.design-preview-workspace select {
+  border: 1px solid var(--w-line);
+  border-radius: 6px;
+  background: #fff;
+  padding: 5px 10px;
+  font-size: 13px !important;
+}
+.design-preview-canvas {
+  overflow: auto !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  padding: 24px !important;
+}
+.design-preview-canvas iframe {
+  max-width: none !important;
+  flex-shrink: 0;
+  border: 1px solid var(--w-line);
+  background: #fff;
+}
+.design-device-switch {
+  flex-wrap: wrap;
+}
+.design-device-switch button {
+  min-height: 40px;
+}
