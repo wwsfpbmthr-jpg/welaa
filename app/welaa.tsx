@@ -18,6 +18,7 @@ import { Home, SearchPage, HowItWorks } from './views';
 import {Explore} from './experience/discover';
 import {HostLanding,SupportPage,supportPaths} from './experience/support';
 import {DesktopNavigation,Footer,AccountNavigation} from './experience/shell';
+import {PreviewTelemetry} from './experience/preview-telemetry';
 import { Detail } from './detail';
 import { Wizard } from './wizard';
 import { Account, HostCalendar } from './account';
@@ -634,6 +635,7 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
 
   return (
     <AppContext.Provider value={{ data, all: data.spaces, previewMode, ready, dataError:error, authReady, busy, act, refresh, auth, go, favorite, signOut }}>
+      {previewMode&&<PreviewTelemetry/>}
       {path !== '/login' && <header className="navbar marketplace-navbar">
         <Logo />
         <DesktopNavigation/>

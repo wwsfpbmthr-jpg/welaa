@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 const widths = [375, 390, 768, 1024, 1440];
@@ -16,6 +16,25 @@ const routes = [
 export default function DesignPreview() {
   const [width, setWidth] = useState(390),
     [route, setRoute] = useState("/");
+  const frame = useRef<HTMLIFrameElement>(null);
+  const [measurement, setMeasurement] = useState<{
+    width: number;
+    scrollWidth: number;
+  } | null>(null);
+  useEffect(() => {
+    const receive = (event: MessageEvent) => {
+      if (
+        event.source !== frame.current?.contentWindow ||
+        event.data?.type !== "welaa-preview-layout"
+      )
+        return;
+      const { width, scrollWidth } = event.data;
+      if (Number.isFinite(width) && Number.isFinite(scrollWidth))
+        setMeasurement({ width, scrollWidth });
+    };
+    window.addEventListener("message", receive);
+    return () => window.removeEventListener("message", receive);
+  }, []);
   return (
     <div className="design-preview-workspace">
       <header>
@@ -56,8 +75,17 @@ export default function DesignPreview() {
           เปิดหน้า <ArrowUpRight size={16} />
         </Link>
       </header>
+      <output
+        data-testid="viewport-measurement"
+        className="v2-preview-measurement"
+      >
+        {measurement
+          ? `Viewport ${measurement.width}px · Content ${measurement.scrollWidth}px · ${measurement.scrollWidth > measurement.width ? "มี horizontal overflow" : "ไม่มี horizontal overflow"}`
+          : "กำลังตรวจ viewport…"}
+      </output>
       <div className="design-preview-canvas">
         <iframe
+          ref={frame}
           title="พรีวิว WELAA"
           src={route}
           style={{ width, height: 900 }}
