@@ -31,13 +31,13 @@ export function Profile() {
       <section className="profile-menu-group"><h2>บัญชีของฉัน</h2>
         <button className="profile-row" onClick={()=>auth()}><CalendarDays/><span><b>การจองของฉัน</b><small>ดูสถานะและรายละเอียดการจอง</small></span><ChevronRight/></button>
         <button className="profile-row" onClick={()=>auth()}><Heart/><span><b>พื้นที่ที่บันทึกไว้</b><small>กลับไปดูพื้นที่ที่คุณสนใจ</small></span><ChevronRight/></button>
-        <button className="profile-row" onClick={()=>auth()}><MessageCircle/><span><b>ข้อความ</b><small>พูดคุยกับเจ้าของพื้นที่</small></span><ChevronRight/></button>
+        <p className="notice">ระบบข้อความยังไม่เปิดให้บริการ</p>
       </section>
       <section className="profile-menu-group"><h2>การตั้งค่าและความช่วยเหลือ</h2>
         <button className="profile-row" onClick={()=>setSettingsOpen(true)}><Settings/><span><b>ตั้งค่า</b><small>จัดการภาษาและการตั้งค่าบัญชี</small></span><ChevronRight/></button>
         <button className="profile-row" onClick={()=>setLanguageOpen(true)}><Languages/><span><b>ภาษา</b><small>{locale==='th'?'ภาษาไทย':'English'}</small></span><ChevronRight/></button>
-        <Link className="profile-row" href="/how-it-works"><CircleHelp/><span><b>วิธีใช้งานและความปลอดภัย</b><small>รู้จักการจองและการใช้พื้นที่</small></span><ChevronRight/></Link>
-        <Link className="profile-row" href="/host/new"><House/><span><b>ปล่อยพื้นที่กับ WELAA</b><small>เริ่มสร้างรายได้จากพื้นที่ว่าง</small></span><ChevronRight/></Link>
+        <Link className="profile-row" href="/help"><CircleHelp/><span><b>วิธีใช้งานและความปลอดภัย</b><small>รู้จักการจองและการใช้พื้นที่</small></span><ChevronRight/></Link>
+        <Link className="profile-row" href="/become-a-host"><House/><span><b>ปล่อยพื้นที่กับ WELAA</b><small>กำหนดเวลาและราคาของพื้นที่ (ยังไม่มีการรับเงินจริง)</small></span><ChevronRight/></Link>
       </section>
     </div>
     <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}><DialogContent><DialogTitle>ตั้งค่า WELAA</DialogTitle><DialogDescription>จัดการการใช้งานบัญชีของคุณ</DialogDescription><button className="profile-row" onClick={()=>{setSettingsOpen(false);setLanguageOpen(true)}}><Languages/><span><b>ภาษา</b><small>ภาษาไทย</small></span><ChevronRight/></button><p className="notice">การแก้ไขข้อมูลส่วนตัวและออกจากระบบจะอยู่ในหน้าโปรไฟล์หลังเข้าสู่ระบบ</p></DialogContent></Dialog>
@@ -67,8 +67,8 @@ export function Profile() {
     <div className="profile-hub-groups">
       <section className="profile-hub-group"><h2>บัญชีของฉัน</h2>
         <ProfileLink href="/account?tab=profile" icon={UserRound} title="ข้อมูลส่วนตัว" sub="ชื่อ เบอร์โทรศัพท์ และแนะนำตัว"/>
-        <ProfileLink href="/account?tab=messages" icon={MessageCircle} title="ข้อความ" sub="พูดคุยเกี่ยวกับพื้นที่"/>
-        <ProfileLink href="/account?tab=reviews" icon={Star} title="รีวิวของฉัน" sub="ประสบการณ์หลังใช้พื้นที่"/>
+        <p className="notice">ระบบข้อความยังไม่เปิดให้บริการ</p>
+        
       </section>
       <section className="profile-hub-group"><h2>สำหรับเจ้าของพื้นที่</h2>
         <ProfileLink href="/host" icon={House} title="จัดการพื้นที่ของฉัน" sub="รายการพื้นที่และเวลาว่าง"/>
@@ -76,7 +76,7 @@ export function Profile() {
         <ProfileLink href="/host/new" icon={Plus} title="เพิ่มพื้นที่" sub="เริ่มลงพื้นที่กับ WELAA"/>
       </section>
       <section className="profile-hub-group"><h2>ช่วยเหลือ</h2>
-        <ProfileLink href="/how-it-works" icon={CircleHelp} title="วิธีใช้งานและความปลอดภัย" sub="รู้จักการจองและการใช้พื้นที่"/>
+        <ProfileLink href="/help" icon={CircleHelp} title="วิธีใช้งานและความปลอดภัย" sub="รู้จักการจองและการใช้พื้นที่"/>
         <a className="profile-hub-row" href="mailto:support@welaa.online?subject=WELAA%20Support"><Mail/><span><b>ติดต่อทีมงาน</b><small>ส่งอีเมลถึงฝ่ายช่วยเหลือ</small></span><ChevronRight/></a>
       </section>
       <section className="profile-hub-group"><h2>บัญชีและการตั้งค่า</h2>

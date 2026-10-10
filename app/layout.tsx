@@ -6,6 +6,7 @@ import './ui-refinements.css';
 import './marketplace-design.css';
 import './search-results.css';
 import './reservation-payment.css';
+import './experience/design-system.css';
 import {previewAllowed} from '@/lib/booking';
 import Welaa from './welaa';
 import {LanguageProvider} from './language';

@@ -15,6 +15,10 @@ import { AppContext } from './context';
 import { AppData, Space, initial, coordinates, datePlus, today, normalizeActivities } from './data';
 import { Logo, LoadingDots } from './ui';
 import { Home, SearchPage, HowItWorks } from './views';
+import {Explore} from './experience/discover';
+import {HostLanding,SupportPage,supportPaths} from './experience/support';
+import {DesktopNavigation,Footer,AccountNavigation} from './experience/shell';
+import {PreviewTelemetry} from './experience/preview-telemetry';
 import { Detail } from './detail';
 import { Wizard } from './wizard';
 import { Account, HostCalendar } from './account';
@@ -73,6 +77,7 @@ function mapListing(row: any): Space {
     distance: 0,
     lat: row.approximate_latitude ?? lat,
     lng: row.approximate_longitude ?? lng,
+    hasCoordinates: Number.isFinite(row.approximate_latitude) && Number.isFinite(row.approximate_longitude),
     open: row.open_hour,
     close: row.close_hour,
     instant: false,
@@ -89,7 +94,7 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
   const showNavigationLoading = useSlowLoading(isNavigating);
   const [pendingPath, setPendingPath] = useState<string | null>(null);
   const navPath = pendingPath ?? path;
-  const activeNavIndex = navPath === '/' ? 0 : navPath === '/search' ? 1 : navPath === '/host/new' ? 2 : navPath === '/account' ? 3 : navPath === '/profile' || navPath === '/host' || navPath === '/host/calendar' ? 4 : -1;
+  const activeNavIndex = navPath === '/' || navPath.startsWith('/explore') ? 0 : navPath === '/search' ? 1 : navPath === '/host/new' ? 2 : navPath === '/account' || navPath.startsWith('/account/') ? 3 : navPath === '/profile' || navPath.startsWith('/host') ? 4 : -1;
   const [data, setData] = useState<AppData>(initial);
   const [ready, setReady] = useState(false);
   const [authReady, setAuthReady] = useState(false);
@@ -614,22 +619,26 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
   if (path === '/login') view = authView;
   else if (path === '/') view = <Home />;
   else if (path === '/search') view = <SearchPage />;
+  else if (path === '/explore' || path.startsWith('/explore/')) view = <Explore path={path}/>;
+  else if (path === '/become-a-host') view = <HostLanding/>;
+  else if (supportPaths.includes(path)) view = <SupportPage path={path}/>;
   else if (path === '/checkout') view = <Checkout />;
   else if (path === '/checkout/test' && previewMode) view = <TestCheckout />;
   else if (path.startsWith('/spaces/')) view = <Detail id={path.split('/')[2]} />;
   else if (path === '/host/new') view = <Wizard />;
-  else if (path === '/host/calendar') view = <HostCalendar />;
-  else if (path === '/account' || path === '/host') view = <Account host={path === '/host'} />;
+  else if (path === '/host/calendar') view = <><div className="page"><AccountNavigation host/></div><HostCalendar /></>;
+  else if (path === '/account' || path === '/host' || ['/account/bookings','/account/saved','/account/payments','/account/profile','/host/listings','/host/bookings','/host/earnings'].includes(path)) view = <Account host={path.startsWith('/host')} />;
   else if (path === '/profile') view = <Profile />;
   else if (path === '/admin') view = <Admin />;
   else if (path === '/how-it-works') view = <HowItWorks />;
   else view = <div className="page empty"><h1>ไม่พบหน้านี้</h1><Link className="button" href="/">กลับหน้าหลัก</Link></div>;
 
   return (
-    <AppContext.Provider value={{ data, all: data.spaces, previewMode, ready, authReady, busy, act, refresh, auth, go, favorite, signOut }}>
+    <AppContext.Provider value={{ data, all: data.spaces, previewMode, ready, dataError:error, authReady, busy, act, refresh, auth, go, favorite, signOut }}>
+      {previewMode&&<PreviewTelemetry/>}
       {path !== '/login' && <header className="navbar marketplace-navbar">
         <Logo />
-        <nav aria-label="เมนูหลักบนคอมพิวเตอร์"><Link aria-current={path==='/search'?'page':undefined} href="/search">ค้นหาพื้นที่</Link><Link href="/host/new">ปล่อยพื้นที่</Link><Link aria-current={path==='/how-it-works'?'page':undefined} href="/how-it-works">วิธีใช้งาน</Link></nav>
+        <DesktopNavigation/>
         {!authReady
           ? <span aria-hidden="true" style={{ display: 'inline-block', width: 46, height: 46, flexShrink: 0 }} />
           : data.user
@@ -661,7 +670,7 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
                   <DropdownMenuItem asChild><Link href="/host"><House />พื้นที่ของฉัน</Link></DropdownMenuItem>
                   <DropdownMenuItem asChild><Link href="/account?tab=saved"><Heart />พื้นที่ที่บันทึกไว้</Link></DropdownMenuItem>
                   <DropdownMenuItem asChild><Link href="/account?tab=profile"><UserRound />โปรไฟล์และการตั้งค่า</Link></DropdownMenuItem>
-                  <DropdownMenuItem asChild><Link href="/how-it-works"><CircleHelp />วิธีใช้งานและความช่วยเหลือ</Link></DropdownMenuItem>
+                  <DropdownMenuItem asChild><Link href="/help"><CircleHelp />ศูนย์ช่วยเหลือ</Link></DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem variant="destructive" onSelect={() => { void signOut(); }}>
                     <LogOut />ออกจากระบบ
@@ -673,19 +682,10 @@ export default function Welaa({previewMode=false}:{previewMode?:boolean}) {
       </header>}
       {error && <div className="data-error">{error} <button className="text-link" onClick={() => void refresh()}>ลองใหม่</button></div>}
 
-      <main className={path === '/login' ? 'auth-main' : undefined} aria-busy={isNavigating}>{view}</main>
+      <a className="v2-skip" href="#main-content">ข้ามไปเนื้อหา</a>
+      <main id="main-content" tabIndex={-1} className={path === '/login' ? 'auth-main' : undefined} aria-busy={isNavigating}>{view}</main>
       {showNavigationLoading && <LoadingDots overlay />}
-      {path !== '/login' && <footer className="footer">
-        <div><Logo /><p>พื้นที่มีค่า ทุกเวลา</p></div>
-        <div className="footer-links">
-          <Link href="/how-it-works">รู้จัก WELAA</Link>
-          <Link href="/host/new">เป็นเจ้าของพื้นที่</Link>
-          <Link href="/account?tab=bookings">การจอง</Link>
-          <span>© {new Date().getFullYear()} WELAA</span>
-        </div>
-      {previewMode && <div className="preview-workspace-bar"><FlaskConical size={14}/><span>พรีวิว WELAA · ไม่รับเงินจริง</span><Link href="/checkout/test?history=1">รายการทดสอบ</Link></div>}
-        <small className="prototype-note">ส่งคำขอจองให้เจ้าของยืนยัน · ยังไม่มีการเรียกเก็บเงินจริง</small>
-      </footer>}
+      {path !== '/login' && <Footer/>}
       {path !== '/login' && <nav className={'bottom-nav' + (activeNavIndex < 0 ? ' no-active' : ' active-' + activeNavIndex)} aria-label="เมนูหลัก">
         <Link className={'bottom-nav-item' + (activeNavIndex === 0 ? ' active' : '')} href="/" onNavigate={(event) => { event.preventDefault(); go('/'); }}><Compass />สำรวจ</Link>
         <Link className={'bottom-nav-item' + (activeNavIndex === 1 ? ' active' : '')} href="/search" onNavigate={(event) => { event.preventDefault(); go('/search'); }}><Search />ค้นหา</Link>
