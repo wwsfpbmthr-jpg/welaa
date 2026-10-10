@@ -114,36 +114,8 @@ export function DiscoverHome() {
   const spaces = publishedSpaces(all).slice(0, 4);
   return (
     <div className="v2-home">
-      <section className="v2-hero">
-        <div className="v2-hero-copy">
-          <span className="eyebrow">SPACE FOR WHAT’S NEXT</span>
-          <h1>
-            พื้นที่ดี ๆ<br />
-            สำหรับทุก<span>ความเป็นไปได้</span>
-          </h1>
-          <p>
-            ประชุม สร้างคอนเทนต์ หรือรวมผู้คน
-            <br />
-            ค้นพบพื้นที่ที่พอดี แล้วเลือกใช้เท่าที่ต้องการ
-          </p>
-          <Link href="/explore" className="v2-text-link">
-            ค้นพบพื้นที่ในแบบของคุณ <ArrowRight size={18} />
-          </Link>
-        </div>
-        <div className="v2-hero-photo">
-          <Image
-            src="/photos/meeting.jpg"
-            alt="ภาพประกอบพื้นที่ประชุมที่มีแสงธรรมชาติ"
-            fill
-            sizes="(max-width:768px) 100vw, 50vw"
-            preload
-          />
-          <span>
-            MAKE ROOM FOR YOUR IDEAS<small>ภาพประกอบแนวคิดการใช้พื้นที่</small>
-          </span>
-        </div>
-      </section>
       <section className="v2-home-search" aria-label="ค้นหาพื้นที่">
+        <h1 className="sr-only">ค้นหาพื้นที่บน WELAA</h1>
         <SearchBox hero />
       </section>
       <section className="v2-section">
