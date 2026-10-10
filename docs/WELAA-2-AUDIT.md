@@ -16,7 +16,7 @@ Baseline: `b27f18e83e52ee4394f69e6bf5e1ab17be988ca1` (main, 10 October 2026).
 
 | Journey           | Routes                                                                                            | Data/behavior                                                                                        |
 | ----------------- | ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| Introduction      | `/`                                                                                               | Editorial brand message, working search, published inventory, real inventory counts                  |
+| Introduction      | `/`                                                                                               | Search-first homepage, published inventory, real inventory counts                  |
 | Discovery         | `/explore`                                                                                        | Activities, cities, and attribute-based collections                                                  |
 | Activity          | `/explore/activity/{meetings,content,workshops,events}`                                           | Published listings matched by normalized activities                                                  |
 | City              | `/explore/city/{city}`                                                                            | Published listings matched by city                                                                   |
@@ -35,7 +35,7 @@ All existing routes and `?tab=` account URLs remain supported. No database migra
 
 Navy `#182d3d`, warm paper `#faf9f6`, white surfaces, neutral borders, restrained brass accent. Thai-first Noto Sans Thai and existing local fonts. Four-pixel spacing base, 1200px content grid, 8–10px component corners, low shadows, visible keyboard focus, reduced motion, native disclosure FAQs, labeled controls and skip navigation.
 
-Activity/collection/hero photos are illustrative assets, not purported live inventory. Listing photos continue to come from actual published listing records. Next Image optimizes known local/storage images and preserves legacy external images without optimization; failed listing images display a clear fallback.
+Activity/collection photos are illustrative assets, not purported live inventory. Listing photos continue to come from actual published listing records. Next Image optimizes known local/storage images and preserves legacy external images without optimization; failed listing images display a clear fallback.
 
 ## Preservation boundary
 
@@ -44,3 +44,7 @@ Kept Supabase client and auth event handling, OAuth providers, safe login return
 ## Remaining product work before live transactions
 
 Finalize legal/privacy policies and verified support channels, identity verification, production payment fulfilment/holds/webhooks/payouts, messaging and reviews. These are explicitly unavailable in the UI and are not silently simulated by this redesign.
+
+## Review adjustment
+
+Removed the large homepage hero (headline, introductory copy, photo and discovery CTA) at the owner’s request. Search now starts immediately below navigation, followed by activity discovery. An accessible page heading remains without a visible replacement hero.
